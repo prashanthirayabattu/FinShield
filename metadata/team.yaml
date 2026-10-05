@@ -1,0 +1,17 @@
+# Build Secure 24 — Team Metadata
+# Team Composition Rule: Exactly 2 or 4 registered participants.
+
+team:
+  team_id: "50"
+  name: "Tech Tribe"
+  repository: "https://github.com/prashanthirayabattu/FinShield.git"
+
+members:
+  - name: "Surya Prashanthi Rayabattu"
+    email: "prashuu181@gmail.com"
+  - name: "Sahithi Puppala"
+    email: "puppalasahithi27@gmail.com"
+  - name: "THOLICHUKKA MANUSHA"
+    email: "25p61a66h3@vbithyd.ac.in"
+  - name: "Thattishetti Bhavani"
+    email: "tbhavanib402@gmail.com"
