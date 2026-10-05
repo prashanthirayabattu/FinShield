@@ -28,6 +28,7 @@ model User {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   transactions Transaction[]
+  budgets      Budget[]
 
   @@index([email])
   @@map("users")
@@ -52,3 +53,21 @@ model Transaction {
   @@index([userId, category])
   @@map("transactions")
 }
+
+model Budget {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category    String
+  limitAmount Decimal  @db.Decimal(12, 2)
+  month       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, category, month], name: "user_category_month_key")
+  @@index([userId])
+  @@index([userId, category])
+  @@index([userId, month])
+  @@map("budgets")
+}
+

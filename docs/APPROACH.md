@@ -352,9 +352,17 @@ A key differentiator of FinShield is connecting scam intelligence directly to th
   - Configured compound indexes in PostgreSQL for tenant queries (`[userId]`, `[userId, transactionDate]`, `[userId, type]`, `[userId, category]`).
   - Enforced `where: { id: transactionId, userId: req.user.userId }` on all individual retrieval, update, and deletion operations, returning 404 when records do not belong to the authenticated user.
   - Applied `.strict()` on Zod request schemas to instantly reject extra/unauthorized properties (such as `userId`, `role`, `isAdmin`).
-  - Implemented 9 dedicated live Neon PostgreSQL test cases in `src/server/tests/transactionIdor.test.ts` covering cross-user IDOR read/update/delete protection, tenant-scoped listing, mass-assignment blocking, input validation edge cases, search filtering, and legitimate transaction lifecycle with full database teardown. All 32 test suite assertions pass cleanly.
+### [2026-10-05 22:00 IST] Entry 8: Milestone 6 — Live PostgreSQL Budgets & Mathematical Financial Dashboard
+- **Focus:** Implemented real PostgreSQL-backed category budgets and live authenticated financial dashboard summary (`GET /api/dashboard/summary`). Added `Budget` model with normalized month (`YYYY-MM`), decimal limit amounts, composite unique constraint `[userId, category, month]`, and tenant indexes. Applied migration `20261005220000_add_budgets` to live Neon PostgreSQL. Implemented live transaction spend aggregation deriving mutable spend directly from real `Transaction` rows rather than storing denormalized totals. Implemented dashboard summary endpoint calculating real `currentBalance`, `totalIncome`, `totalExpenses`, `totalSavings`, `categoryBreakdown`, and `budgetAlerts`.
+- **Key Challenges:** Maintaining strict mathematical consistency (`balance = income - expenses`, `savings = balance`, `categoryBreakdown sum == totalExpenses`), dynamically tracking budget utilization statuses (`SAFE` <80%, `WARNING` 80%-99%, `EXCEEDED` >=100%), preventing BOLA/IDOR on budget CRUD, enforcing mass-assignment rejection via `.strict()`, and ensuring 100% test isolation across suites.
+- **Resolution:**
+  - Automated dynamic budget utilization calculation directly via PostgreSQL aggregations over authenticated user transactions.
+  - Implemented 10 comprehensive tests in `src/server/tests/budgetDashboard.test.ts` covering cross-user IDOR read/update/delete rejection (404), tenant-isolated listing, mass assignment blocking, 80% warning and 100% exceeded thresholds, and dashboard mathematical consistency.
+  - Configured sequential test execution (`--test-concurrency=1`) preserving isolated test state. All 42 automated test assertions passed across 4 test suites with zero failures. Database row counts confirmed at 0 after teardown.
+  - Connected frontend `BudgetsPage` (edit/delete/progress/alerts) and `DashboardPage` (live statistics/breakdown/alerts) to live backend endpoints.
 
 ---
+
 
 
 ## 6. Testing, Security Verification & Deployment Record

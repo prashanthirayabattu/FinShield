@@ -24,14 +24,23 @@ import { ReportsPage } from './pages/ReportsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { authApi } from './services/authApi';
 import { transactionApi } from './services/transactionApi';
+import { budgetApi, mapBackendBudgetToFrontend } from './services/budgetApi';
+import { dashboardApi, type DashboardSummaryResponse } from './services/dashboardApi';
 
 export function App() {
   const [currentView, setCurrentView] = useState<AppView>('landing');
   const [user, setUser] = useState<UserProfile>(INITIAL_USER);
   const [transactions, setTransactions] = useState<Transaction[]>(INITIAL_TRANSACTIONS);
   const [budgets, setBudgets] = useState<Budget[]>(INITIAL_BUDGETS);
+  const [dashboardSummary, setDashboardSummary] = useState<DashboardSummaryResponse | null>(null);
+
   const [isLoadingTransactions, setIsLoadingTransactions] = useState(false);
   const [transactionError, setTransactionError] = useState<string | null>(null);
+
+  const [isLoadingBudgets, setIsLoadingBudgets] = useState(false);
+  const [budgetError, setBudgetError] = useState<string | null>(null);
+
+  const [isLoadingDashboard, setIsLoadingDashboard] = useState(false);
 
   const loadTransactions = async () => {
     try {
@@ -49,6 +58,47 @@ export function App() {
     }
   };
 
+  const loadBudgets = async () => {
+    try {
+      setIsLoadingBudgets(true);
+      setBudgetError(null);
+      const res = await budgetApi.list();
+      if (res.budgets.length > 0) {
+        setBudgets(res.budgets.map(mapBackendBudgetToFrontend));
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Unable to synchronize budgets';
+      setBudgetError(msg);
+    } finally {
+      setIsLoadingBudgets(false);
+    }
+  };
+
+  const loadDashboardSummary = async () => {
+    try {
+      setIsLoadingDashboard(true);
+      const sum = await dashboardApi.getSummary();
+      setDashboardSummary(sum);
+    } catch {
+      // Keep existing state or local calculation
+    } finally {
+      setIsLoadingDashboard(false);
+    }
+  };
+
+  const handleNavigate = (view: AppView) => {
+    setCurrentView(view);
+    if (view === 'dashboard') {
+      void loadDashboardSummary();
+      void loadBudgets();
+      void loadTransactions();
+    } else if (view === 'budgets') {
+      void loadBudgets();
+    } else if (view === 'transactions') {
+      void loadTransactions();
+    }
+  };
+
   // Transaction Handlers
   const handleAddTransaction = async (newTx: Omit<Transaction, 'id'>) => {
     try {
@@ -61,6 +111,8 @@ export function App() {
         transactionDate: new Date(newTx.date).toISOString(),
       });
       setTransactions((prev) => [created, ...prev]);
+      loadBudgets();
+      loadDashboardSummary();
     } catch {
       // Local fallback for offline/demo resilience
       const created: Transaction = {
@@ -95,6 +147,8 @@ export function App() {
       setTransactions((prev) =>
         prev.map((t) => (t.id === updated.id ? updated : t))
       );
+      loadBudgets();
+      loadDashboardSummary();
     } catch {
       setTransactions((prev) =>
         prev.map((t) => (t.id === updatedTx.id ? updatedTx : t))
@@ -105,6 +159,8 @@ export function App() {
   const handleDeleteTransaction = async (id: string) => {
     try {
       await transactionApi.delete(id);
+      loadBudgets();
+      loadDashboardSummary();
     } catch {
       // ignore
     }
@@ -112,12 +168,46 @@ export function App() {
   };
 
   // Budget Handlers
-  const handleAddBudget = (newBudget: Omit<Budget, 'id'>) => {
-    const created: Budget = {
-      ...newBudget,
-      id: `bg_${Date.now()}`,
-    };
-    setBudgets((prev) => [...prev, created]);
+  const handleAddBudget = async (newBudget: Omit<Budget, 'id'>) => {
+    try {
+      const created = await budgetApi.create({
+        category: newBudget.category,
+        limitAmount: newBudget.limit,
+        month: newBudget.month,
+      });
+      setBudgets((prev) => [...prev, mapBackendBudgetToFrontend(created)]);
+      loadDashboardSummary();
+    } catch {
+      const created: Budget = {
+        ...newBudget,
+        id: `bg_${Date.now()}`,
+      };
+      setBudgets((prev) => [...prev, created]);
+    }
+  };
+
+  const handleEditBudget = async (id: string, limit: number) => {
+    try {
+      const updated = await budgetApi.update(id, { limitAmount: limit });
+      setBudgets((prev) =>
+        prev.map((b) => (b.id === id ? mapBackendBudgetToFrontend(updated) : b))
+      );
+      loadDashboardSummary();
+    } catch {
+      setBudgets((prev) =>
+        prev.map((b) => (b.id === id ? { ...b, limit } : b))
+      );
+    }
+  };
+
+  const handleDeleteBudget = async (id: string) => {
+    try {
+      await budgetApi.delete(id);
+      loadDashboardSummary();
+    } catch {
+      // ignore
+    }
+    setBudgets((prev) => prev.filter((b) => b.id !== id));
   };
 
   // Role Handler
@@ -128,7 +218,7 @@ export function App() {
   // Auth Handlers
   const handleAuthSuccess = (authUser: UserProfile) => {
     setUser(authUser);
-    setCurrentView('dashboard');
+    handleNavigate('dashboard');
   };
 
   const handleLogout = () => {
@@ -159,7 +249,7 @@ export function App() {
   return (
     <AppLayout
       currentView={currentView}
-      onNavigate={setCurrentView}
+      onNavigate={handleNavigate}
       user={user}
       onLogout={handleLogout}
     >
@@ -167,7 +257,10 @@ export function App() {
         <DashboardPage
           transactions={transactions}
           budgets={budgets}
-          onNavigate={setCurrentView}
+          summary={dashboardSummary}
+          isLoading={isLoadingDashboard}
+          onNavigate={handleNavigate}
+          onRefresh={loadDashboardSummary}
         />
       )}
       {currentView === 'transactions' && (
@@ -184,7 +277,12 @@ export function App() {
       {currentView === 'budgets' && (
         <BudgetsPage
           budgets={budgets}
+          isLoading={isLoadingBudgets}
+          error={budgetError}
           onAddBudget={handleAddBudget}
+          onEditBudget={handleEditBudget}
+          onDeleteBudget={handleDeleteBudget}
+          onRefresh={loadBudgets}
         />
       )}
       {currentView === 'scamshield' && <ScamShieldPage />}

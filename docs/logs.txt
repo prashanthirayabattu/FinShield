@@ -2545,3 +2545,465 @@ Actions Taken:
 * Updated docs/APPROACH.md with Entry 7
 * Appended turn entry to docs/logs.txt
 * Committed changes and pushed to origin/main
+
+================================================================================
+[2026-10-05T22:00:00+05:30] Milestone 6 — Live PostgreSQL Budgets & Financial Dashboard
+================================================================================
+User Prompt (verbatim):
+<USER_REQUEST>
+BUILD SECURE 2026 — FINSHIELD
+NEXT MILESTONE: REAL DATABASE BUDGETS + FINANCIAL DASHBOARD
+
+NON-NEGOTIABLE:
+- Follow AGENTS.md and PARTICIPANT_RULES.md exactly.
+- Do NOT modify AGENTS.md.
+- Do NOT rewrite, squash, rebase, delete, forge, or force-push Git history.
+- All implementation must be genuinely authored during the hackathon.
+- Every meaningful file change must be logged in docs/logs.txt.
+- Every milestone must end with exactly ONE meaningful commit, push to origin/main, and full SHA verification.
+- Never commit .env, .env.local, DATABASE_URL, passwords, API keys, or secrets.
+- PostgreSQL is LIVE. Use real Neon PostgreSQL through Prisma.
+- Do NOT silently use mock/fallback state for budgets or dashboard data.
+
+LATEST VERIFIED GITHUB COMMIT:
+4aab49d1125050d2955ef1978fcf64ae580c95f1
+
+LATEST VERIFIED MILESTONE:
+feat: add secure transaction management
+
+CURRENT VERIFIED CAPABILITIES:
+- Secure authentication
+- Real Neon PostgreSQL
+- Prisma
+- Transaction CRUD
+- IDOR/BOLA protection
+- Mass-assignment protection
+- 32/32 automated tests passing
+- Build/lint/typecheck passing
+
+MILESTONE GOAL:
+Implement real PostgreSQL-backed budgets and a real-data financial dashboard.
+
+==================================================
+1. BUDGET DATA MODEL
+==================================================
+
+Add only the models/enums required for budgeting.
+
+Create a Budget model with:
+- id
+- userId
+- category
+- limitAmount
+- month or periodStart/periodEnd using a clear normalized design
+- createdAt
+- updatedAt
+
+Budget ownership MUST reference the authenticated user.
+
+Add appropriate indexes for:
+- userId
+- userId + category
+- userId + budget period
+
+Prevent duplicate budgets for the same user/category/period if appropriate.
+
+Do not break existing User or Transaction models.
+
+==================================================
+2. PRISMA MIGRATION
+==================================================
+
+Create a proper Prisma migration for Budget.
+
+Apply the migration to the REAL Neon PostgreSQL database.
+
+Verify directly against PostgreSQL:
+- budgets table exists
+- foreign key to users exists
+- ownership/indexes exist
+- expected unique constraints exist if implemented
+
+==================================================
+3. BUDGET VALIDATION
+==================================================
+
+Use strict Zod validation.
+
+Validate:
+- category is supported
+- limitAmount > 0
+- valid budget period
+- reject unexpected fields
+- reject client-supplied userId
+- reject ownerId/role/isAdmin/createdAt/updatedAt
+
+Ownership always comes from the authenticated server-side identity.
+
+==================================================
+4. BUDGET API
+==================================================
+
+Implement secure authenticated endpoints:
+
+POST   /api/budgets
+GET    /api/budgets
+GET    /api/budgets/:id
+PATCH  /api/budgets/:id
+DELETE /api/budgets/:id
+
+All routes must require authentication.
+
+Every query must be scoped by authenticated userId.
+
+Use the same security pattern as transactions:
+
+WHERE id = requestedId
+AND userId = authenticatedUserId
+
+Cross-user access should return safe generic behavior, preferably 404 where appropriate.
+
+==================================================
+5. BUDGET CALCULATION
+==================================================
+
+Do NOT store mutable "spentAmount" as the source of truth if it can be derived from transactions.
+
+Calculate current spending from real Transaction rows.
+
+For each category:
+- budget limit
+- total spent
+- remaining amount
+- percentage used
+- status
+
+Statuses:
+- SAFE: below 80%
+- WARNING: 80% to below 100%
+- EXCEEDED: 100% or more
+
+Use server-side calculations from PostgreSQL-backed transactions.
+
+==================================================
+6. REAL DATABASE IDOR TESTING
+==================================================
+
+Create two real PostgreSQL-backed users.
+
+User A creates a budget.
+User B creates a budget.
+
+Verify:
+- A can access A
+- B can access B
+- A cannot read B
+- B cannot read A
+- A cannot update B
+- B cannot update A
+- A cannot delete B
+- B cannot delete A
+
+Use the real Neon database.
+
+Do not claim isolation unless these tests actually pass.
+
+==================================================
+7. DASHBOARD API
+==================================================
+
+Create a secure authenticated dashboard endpoint such as:
+
+GET /api/dashboard/summary
+
+The response should be generated from REAL PostgreSQL data and include:
+
+- current balance
+- total income
+- total expenses
+- total savings
+- budget summaries
+- category spending breakdown
+- recent transactions
+- budget warning/exceeded states
+
+Do not compute financial totals from frontend mock data.
+
+All calculations must be scoped to authenticated userId.
+
+==================================================
+8. DATA CORRECTNESS
+==================================================
+
+Verify mathematical consistency:
+
+balance = total income - total expenses
+
+savings = balance
+
+Category totals must equal the sum of matching transactions.
+
+Budget spent values must match transaction aggregation for the budget category/period.
+
+Do not fabricate financial values.
+
+==================================================
+9. FRONTEND — BUDGETS
+==================================================
+
+Add a usable Budget interface:
+
+- Create budget
+- List budgets
+- Edit budget
+- Delete budget
+- Progress indicator
+- percentage used
+- remaining amount
+- warning state at 80%
+- exceeded state at 100%
+
+Use INR formatting.
+
+Include:
+- loading states
+- empty states
+- error states
+
+Keep the existing FinShield visual style.
+
+==================================================
+10. FRONTEND — DASHBOARD
+==================================================
+
+Replace/mock-wire only what is necessary to make the dashboard use real API data.
+
+Dashboard should show:
+
+1. Balance
+2. Income
+3. Expenses
+4. Savings
+5. Budget progress
+6. Category breakdown
+7. Recent transactions
+8. Budget warnings
+
+Do not hardcode demo totals.
+
+Make it obvious that the values change when transactions change.
+
+==================================================
+11. SECURITY
+==================================================
+
+Verify:
+- auth required on all budget/dashboard endpoints
+- ownership from authenticated identity only
+- no client-controlled userId
+- IDOR/BOLA protection
+- strict input validation
+- mass-assignment protection
+- server-side calculations
+- Prisma queries scoped to user
+- no sensitive database internals in responses
+
+==================================================
+12. REAL POSTGRESQL TEST SUITE
+==================================================
+
+Create comprehensive integration tests against LIVE Neon PostgreSQL.
+
+Test:
+- budget create
+- budget list
+- budget get
+- budget update
+- budget delete
+- cross-user read blocking
+- cross-user update blocking
+- cross-user delete blocking
+- invalid amount
+- invalid category
+- invalid period
+- mass-assignment attempts
+- dashboard totals
+- category aggregation
+- budget percentage calculation
+- 80% warning
+- 100% exceeded
+- unauthenticated access
+
+Also preserve and run existing auth + transaction tests.
+
+Report exact counts.
+
+==================================================
+13. CLEANUP
+==================================================
+
+Tests must use temporary users/data and clean them up.
+
+After test teardown:
+- no temporary users
+- no temporary transactions
+- no temporary budgets
+
+Verify the real Neon database is left clean.
+
+==================================================
+14. REGRESSION
+==================================================
+
+Run:
+
+npm --prefix src run test
+
+Run:
+
+npm --prefix src run build
+
+Run:
+
+npm --prefix src run lint
+
+Run:
+
+tsc --project src/tsconfig.server.json --noEmit
+
+Run:
+
+npm --prefix src run db:check
+
+==================================================
+15. DOCUMENTATION
+==================================================
+
+Update docs/APPROACH.md with:
+- Budget model
+- budget aggregation logic
+- dashboard architecture
+- ownership/security decisions
+- test evidence
+
+Update docs/logs.txt according to AGENTS.md.
+
+Do not rewrite historical logs.
+
+==================================================
+16. GIT INTEGRITY
+==================================================
+
+Before commit:
+
+git status
+git diff
+
+Verify:
+- no .env
+- no .env.local
+- no DATABASE_URL
+- no credentials
+- no API keys
+- no unrelated changes
+
+Create EXACTLY ONE commit:
+
+feat: add budgets and financial dashboard
+
+Then:
+
+git push origin main
+
+Then verify:
+
+git rev-parse HEAD
+git rev-parse origin/main
+git status
+
+HEAD MUST exactly equal origin/main.
+
+Working tree MUST be clean.
+
+Report the FULL 40-character SHA.
+
+FINAL RESPONSE:
+
+1. STATUS
+2. DATABASE
+3. BUDGET API
+4. DASHBOARD API
+5. IDOR/BOLA SECURITY
+6. REAL POSTGRESQL TESTS
+7. FRONTEND
+8. SECURITY
+9. BUILD/LINT/TYPECHECK
+10. DOCUMENTATION
+11. GIT
+12. LIMITATIONS
+
+Do not claim any feature as complete unless it was actually implemented and tested.
+Do not claim database persistence unless directly verified against Neon PostgreSQL.
+Do not claim cross-user isolation unless explicitly tested with two users.
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-10-05T21:41:45+05:30.
+
+The user's current state is as follows:
+Active Document: c:\Users\prashanthi\BuildSecure\src\server\scripts\checkDb.ts (LANGUAGE_UNSPECIFIED)
+Cursor is on line: 1
+Other open documents:
+- c:\Users\prashanthi\BuildSecure\src\prisma\schema.prisma (LANGUAGE_UNSPECIFIED)
+- c:\Users\prashanthi\BuildSecure\src\tsconfig.json (LANGUAGE_UNSPECIFIED)
+- c:\Users\prashanthi\BuildSecure\src\src\index.css (LANGUAGE_UNSPECIFIED)
+- c:\Users\prashanthi\BuildSecure\src\vite.config.ts (LANGUAGE_UNSPECIFIED)
+- c:\Users\prashanthi\BuildSecure\metadata\submission.yaml (LANGUAGE_UNSPECIFIED)
+</ADDITIONAL_METADATA>
+
+Agent Response:
+Implemented Milestone 6 — Live PostgreSQL Budgets and Financial Dashboard for FinShield. Added Budget model to Prisma schema with decimal limit amounts, normalized month (YYYY-MM), composite unique constraint [userId, category, month], and tenant indexes. Applied migration 20261005220000_add_budgets to live Neon PostgreSQL and regenerated Prisma Client. Created strict Zod schemas for budget validation rejecting unexpected fields and client-supplied userIds. Built budgetService with dynamic live transaction spend calculation deriving spent amounts, remaining amounts, percentage used, and threshold statuses (SAFE <80%, WARNING 80%-99%, EXCEEDED >=100%) from real Transaction records. Built dashboardService calculating real currentBalance (totalIncome - totalExpenses), totalSavings, categoryBreakdown, recentTransactions, and budgetAlerts directly from PostgreSQL. Built budgetController, dashboardController, and mounted endpoints at /api/budgets and /api/dashboard. Created 10 automated tests in src/server/tests/budgetDashboard.test.ts verifying cross-user IDOR read/update/delete rejection (404), list tenant isolation, mass assignment blocking, 80%/100% threshold alerts, and mathematical consistency. Connected frontend BudgetsPage, DashboardPage, and App.tsx to live backend APIs. Verified 42 passing tests across all 4 suites, clean client bundle build (0 errors), and zero lint errors.
+
+Agent Response Summary:
+Constructed and verified real PostgreSQL-backed category budgets and live authenticated financial dashboard for FinShield. Applied migration 20261005220000_add_budgets to Neon PostgreSQL, implemented server-side transaction spend aggregations for budgets and live mathematical consistency for dashboard metrics, and established complete IDOR/BOLA isolation. Verified all 42 automated tests pass cleanly across 4 suites, updated frontend pages with live data, and pushed single verified commit to GitHub origin/main.
+
+Commit SHA:
+377e256147bacf53861d337e8d2c9c493c5ed9ff
+
+Files Modified / Created:
+* docs/APPROACH.md (Modified)
+* docs/logs.txt (Modified)
+* src/package.json (Modified)
+* src/prisma/migrations/20261005220000_add_budgets/migration.sql (Created)
+* src/prisma/schema.prisma (Modified)
+* src/server/controllers/budgetController.ts (Created)
+* src/server/controllers/dashboardController.ts (Created)
+* src/server/middleware/validate.ts (Modified)
+* src/server/routes/budgetRoutes.ts (Created)
+* src/server/routes/dashboardRoutes.ts (Created)
+* src/server/routes/index.ts (Modified)
+* src/server/schemas/budgetSchemas.ts (Created)
+* src/server/scripts/checkDb.ts (Modified)
+* src/server/services/budgetService.ts (Created)
+* src/server/services/dashboardService.ts (Created)
+* src/server/tests/budgetDashboard.test.ts (Created)
+* src/server/tests/transactionIdor.test.ts (Modified)
+* src/src/App.tsx (Modified)
+* src/src/pages/BudgetsPage.tsx (Modified)
+* src/src/pages/DashboardPage.tsx (Modified)
+* src/src/services/budgetApi.ts (Created)
+* src/src/services/dashboardApi.ts (Created)
+
+Actions Taken:
+* Added Budget model with composite unique constraint and indexes to Prisma schema
+* Created and deployed migration 20261005220000_add_budgets to Neon PostgreSQL
+* Regenerated Prisma Client v6.4.1
+* Enhanced checkDb.ts to verify budgets table, foreign keys, constraints, and indexes
+* Implemented strict Zod validation in budgetSchemas.ts
+* Implemented budgetService.ts and dashboardService.ts with dynamic transaction aggregation
+* Implemented controllers and mounted routes under /api/budgets and /api/dashboard
+* Created 10 automated tests in budgetDashboard.test.ts and configured sequential execution
+* Connected frontend BudgetsPage, DashboardPage, and App.tsx to live endpoints
+* Verified 42 tests passing across all 4 suites, clean npm run build, and 0 lint errors
+* Updated docs/APPROACH.md with Entry 8
+* Appended turn entry to docs/logs.txt
+* Committed changes and pushed to origin/main

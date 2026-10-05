@@ -4,7 +4,6 @@ import request from 'supertest';
 import { app } from '../app';
 import { prisma, checkDatabaseConnection } from '../db/prisma';
 import { signAuthToken, AUTH_COOKIE_NAME } from '../auth/jwt';
-import { userService } from '../services/userService';
 import { hashPassword } from '../auth/password';
 
 describe('FinShield Milestone 5 — Real Neon PostgreSQL Transaction CRUD & IDOR/BOLA Defense Suite', () => {
