@@ -340,6 +340,11 @@ A key differentiator of FinShield is connecting scam intelligence directly to th
 - **Key Challenges:** Ensuring deterministic database schema synchronization and migration readiness while maintaining zero credential leaks and seamless graceful fallback when a live database is pending provisioning.
 - **Resolution:** Scripted offline migration generation via Prisma diffing against the datamodel; validated schema fidelity; created a safe diagnostic tool that verifies database reachability without credential exposure; confirmed test suite execution (14 passing tests).
 
+### [2026-10-05 19:48 IST] Entry 5: Milestone 3.1 — PostgreSQL Integration Testing & Verification
+- **Focus:** Created dedicated live vs. fallback integration test suite (`src/server/tests/dbIntegration.test.ts`), enhanced schema diagnostics (`src/server/scripts/checkDb.ts`), hardened `.gitignore` against accidental `.env` leakage, and audited database connectivity state.
+- **Key Challenges:** Distinguishing isolated unit/fallback test execution from live PostgreSQL operations to maintain 100% truthful reporting, ensuring zero secrets are committed or displayed in logs.
+- **Resolution:** Implemented explicit store classification in test suites; verified that database schema definitions and migration scripts are ready for deployment; confirmed diagnostic utilities safely mask credentials; documented the local/cloud provisioning workflow for `DATABASE_URL`.
+
 ---
 
 ## 6. Testing, Security Verification & Deployment Record

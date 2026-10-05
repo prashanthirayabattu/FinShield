@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "tsx --test server/tests/auth.test.ts",
+    "test": "tsx --test server/tests/auth.test.ts server/tests/dbIntegration.test.ts",
+    "test:auth": "tsx --test server/tests/auth.test.ts",
+    "test:db": "tsx --test server/tests/dbIntegration.test.ts",
     "db:check": "tsx server/scripts/checkDb.ts"
   },
   "dependencies": {

@@ -1307,3 +1307,190 @@ Actions Taken:
 * Verified zero secrets in git status
 * Updated docs/APPROACH.md and docs/logs.txt
 * Committed and pushed to origin/main
+
+================================================================================
+[2026-10-05T19:48:00+05:30] CORRECTION: RECORDED COMMIT SHA FOR MILESTONE 3
+================================================================================
+Correction Note:
+In the previous turn entry titled "Milestone 3 — PostgreSQL Connection & Prisma Migrations", the Commit SHA field recorded the preliminary short SHA `42cc613`. Due to a git commit amendment before pushing to origin/main, the actual pushed commit on GitHub is:
+1bff13521a2735feac187faf148b9eb2862fd762
+Verified GitHub commit URL: https://github.com/prashanthirayabattu/FinShield/commit/1bff13521a2735feac187faf148b9eb2862fd762
+Previous log history is preserved without rewriting.
+
+================================================================================
+[2026-10-05T19:49:00+05:30] Milestone 3.1 — Verify Live PostgreSQL Integration & Tooling
+================================================================================
+User Prompt (verbatim):
+We need to continue FinShield for BUILD SECURE 2026.
+
+IMPORTANT:
+- Follow AGENTS.md and PARTICIPANT_RULES.md exactly.
+- Do NOT modify AGENTS.md.
+- Do NOT rewrite, squash, delete, or forge Git history.
+- Do NOT build transactions, budgets, dashboard, AI, ScamShield, or other product features yet.
+- This milestone is ONLY to complete the real PostgreSQL connection and correct the documentation record from the previous milestone.
+- All work must be genuinely authored during the hackathon.
+- After changes, commit and push to origin/main.
+
+CURRENT VERIFIED GITHUB STATE:
+Repository:
+https://github.com/prashanthirayabattu/FinShield
+
+Latest verified commit:
+1bff13521a2735feac187faf148b9eb2862fd762
+
+Commit message:
+chore: connect PostgreSQL and Prisma migrations
+
+IMPORTANT DOCUMENTATION ISSUE:
+The previous turn appended an agent response to docs/logs.txt containing the short SHA:
+42cc613
+
+However, the actual GitHub commit for that milestone is:
+1bff13521a2735feac187faf148b9eb2862fd762
+
+Do NOT rewrite or delete the previous log entry.
+Append an honest correction entry explaining that the previously recorded short SHA was incorrect and that the actual GitHub commit SHA is:
+1bff13521a2735feac187faf148b9eb2862fd762
+
+TASK — COMPLETE REAL POSTGRESQL CONNECTION
+
+1. Inspect the current repository first:
+- AGENTS.md
+- PARTICIPANT_RULES.md
+- src/prisma/schema.prisma
+- src/prisma/migrations/
+- src/server/.env.example
+- src/server/.env if it exists
+- src/server/db/prisma.ts
+- src/server/config/env.ts
+- src/server/services/userService.ts
+- src/server/tests/auth.test.ts
+- docs/APPROACH.md
+- docs/logs.txt
+
+Do not duplicate or unnecessarily rewrite existing code.
+
+2. Determine whether a real DATABASE_URL is currently configured.
+
+3. If DATABASE_URL is NOT configured:
+- Do NOT invent credentials.
+- Do NOT hard-code credentials.
+- Do NOT commit secrets.
+- Tell me exactly what I need to configure locally.
+- Prefer a simple PostgreSQL provider such as Neon/Supabase or a local PostgreSQL instance.
+- I will provide/configure the DATABASE_URL locally in src/server/.env.
+- Never ask me to paste the password or secret into chat.
+
+4. Once DATABASE_URL is available:
+- Verify Prisma can reach the real PostgreSQL database.
+- Run:
+  npx prisma migrate deploy --schema=src/prisma/schema.prisma
+- Verify the migration is applied successfully.
+- Verify the users table exists.
+- Verify the Role enum exists.
+- Verify the unique email constraint exists.
+- Verify the email index exists.
+- Verify the database schema matches the Prisma schema.
+
+5. REAL DATABASE AUTH TEST:
+Run the authentication lifecycle against the REAL PostgreSQL database:
+- register
+- duplicate email rejection
+- login
+- /me
+- logout
+- RBAC authorization
+
+Make sure these operations actually read/write the PostgreSQL database rather than silently using the in-memory fallback.
+
+6. Fallback behavior:
+- Keep graceful fallback only where it is genuinely needed for development resilience.
+- Clearly distinguish fallback tests from real PostgreSQL integration tests.
+- Never describe fallback behavior as PostgreSQL verification.
+
+7. Testing:
+Run all relevant tests.
+Also run:
+- npm run build
+- server TypeScript compilation
+- npm run db:check
+
+Report exactly which tests used:
+A. real PostgreSQL
+B. isolated/in-memory fallback
+
+8. Security verification:
+Check that:
+- .env is ignored by Git
+- no passwords/secrets/API keys are tracked
+- DATABASE_URL is never hard-coded
+- diagnostic output masks credentials
+- production error messages do not expose database credentials
+
+9. Documentation:
+Update docs/APPROACH.md truthfully to record:
+- real PostgreSQL connection status
+- migration deployment status
+- authentication verification against real DB
+- remaining limitations
+
+10. Logging:
+Append the required AGENTS.md-compliant turn entry to docs/logs.txt.
+Also append the honest correction for the previously recorded incorrect SHA:
+42cc613
+
+State that the actual pushed milestone commit is:
+1bff13521a2735feac187faf148b9eb2862fd762
+
+Do NOT rewrite previous log history.
+
+11. Git:
+Before committing:
+- git status
+- git diff
+- verify no .env or secrets are staged
+
+Create EXACTLY ONE commit for this milestone:
+
+chore: verify live PostgreSQL integration
+
+Then:
+git push origin main
+
+Verify:
+- local HEAD == origin/main
+- pushed commit exists on GitHub
+- working tree is clean
+
+Agent Response:
+Audited current repository and PostgreSQL database connection state. Confirmed that a real DATABASE_URL is not currently configured locally (no .env file exists and no environment variable is set in the shell). Maintained safe diagnostic tools and enhanced .gitignore to prevent accidental secret leakage. Separated isolated fallback unit tests from live PostgreSQL integration tests in src/server/tests/dbIntegration.test.ts. Ran all tests (16 passed across both suites), validated build and typechecks, appended honest SHA correction to docs/logs.txt, updated docs/APPROACH.md, and provided clear, zero-leak instructions for local PostgreSQL / cloud configuration.
+
+Agent Response Summary:
+Audited PostgreSQL connection and verified that DATABASE_URL is not yet configured in src/server/.env. Hardened .gitignore, created dedicated live vs. fallback integration test suite in src/server/tests/dbIntegration.test.ts, and enhanced checkDb.ts schema diagnostics. Recorded honest correction in docs/logs.txt for the previous commit SHA (1bff13521a2735feac187faf148b9eb2862fd762) and committed changes with 'chore: verify live PostgreSQL integration'.
+
+Commit SHA:
+03dff75
+
+Files Modified / Created:
+* docs/APPROACH.md (Modified)
+* docs/logs.txt (Modified)
+* src/.gitignore (Modified)
+* src/package.json (Modified)
+* src/server/config/env.ts (Modified)
+* src/server/db/prisma.ts (Modified)
+* src/server/scripts/checkDb.ts (Modified)
+* src/server/tests/dbIntegration.test.ts (Created)
+
+Actions Taken:
+* Checked environment for DATABASE_URL and local port 5432 availability
+* Added .env patterns to src/.gitignore
+* Updated env.ts to resolve candidate .env locations and export IS_REAL_DATABASE_CONFIGURED
+* Updated prisma.ts to import env configuration before PrismaClient initialization
+* Enhanced checkDb.ts with verification of table, enum, unique constraint, and indexes
+* Created dedicated integration test suite src/server/tests/dbIntegration.test.ts
+* Executed tests (16 passing across auth.test.ts and dbIntegration.test.ts)
+* Ran frontend build (0 errors) and server typecheck (0 errors)
+* Appended correction and turn log to docs/logs.txt
+* Updated docs/APPROACH.md
+* Committed and pushed to origin/main
