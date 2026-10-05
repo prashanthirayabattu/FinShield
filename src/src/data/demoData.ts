@@ -1,0 +1,260 @@
+import type { Transaction, Budget, UserProfile, SecurityControlStatus, ScamCheckResult } from '../types';
+
+export const INITIAL_USER: UserProfile = {
+  id: 'usr_50_tech_tribe',
+  name: 'Surya Prashanthi',
+  email: 'prashuu181@gmail.com',
+  role: 'USER',
+  joinedDate: '2026-10-05',
+  securityStatus: 'SECURE',
+};
+
+export const INITIAL_TRANSACTIONS: Transaction[] = [
+  {
+    id: 'tx_001',
+    amount: 1450.0,
+    type: 'EXPENSE',
+    date: '2026-10-05',
+    description: 'Fresh groceries & vegetables',
+    payee: 'Reliance Smart Supermarket',
+    category: 'Food',
+  },
+  {
+    id: 'tx_002',
+    amount: 52000.0,
+    type: 'INCOME',
+    date: '2026-10-01',
+    description: 'Monthly Engineering Salary',
+    payee: 'Tech Tribe Cyber Systems',
+    category: 'Other',
+  },
+  {
+    id: 'tx_003',
+    amount: 2200.0,
+    type: 'EXPENSE',
+    date: '2026-10-03',
+    description: 'Fiber Internet & 5G Data Bill',
+    payee: 'Airtel Broadband Solutions',
+    category: 'Bills',
+  },
+  {
+    id: 'tx_004',
+    amount: 850.0,
+    type: 'EXPENSE',
+    date: '2026-10-04',
+    description: 'Metro card auto-recharge',
+    payee: 'L&T Metro Rail Hyd',
+    category: 'Transport',
+  },
+  {
+    id: 'tx_005',
+    amount: 3499.0,
+    type: 'EXPENSE',
+    date: '2026-10-02',
+    description: 'Cybersecurity Certification Exam Fee',
+    payee: 'CompTIA Global Academy',
+    category: 'Education',
+  },
+  {
+    id: 'tx_006',
+    amount: 1999.0,
+    type: 'EXPENSE',
+    date: '2026-10-04',
+    description: 'Claimed prize processing fee (Flagged UPI)',
+    payee: 'lucky-lottery-claim@ybl',
+    category: 'Other',
+    isFlaggedSuspicious: true,
+    suspiciousReason: 'Matches high-risk ScamShield lottery lure pattern',
+  },
+  {
+    id: 'tx_007',
+    amount: 650.0,
+    type: 'EXPENSE',
+    date: '2026-10-05',
+    description: 'Weekend cinema tickets & snacks',
+    payee: 'PVR Inox Cinemas',
+    category: 'Entertainment',
+  },
+  {
+    id: 'tx_008',
+    amount: 890.0,
+    type: 'EXPENSE',
+    date: '2026-10-04',
+    description: 'Pharmacy prescription medicines',
+    payee: 'Apollo Pharmacy Ltd',
+    category: 'Healthcare',
+  },
+];
+
+export const INITIAL_BUDGETS: Budget[] = [
+  {
+    id: 'bg_001',
+    category: 'Food',
+    limit: 8000.0,
+    spent: 6850.0, // ~85.6% -> Trigger >80% warning
+    month: '2026-10',
+  },
+  {
+    id: 'bg_002',
+    category: 'Bills',
+    limit: 5000.0,
+    spent: 5350.0, // >100% -> Trigger exceeded warning
+    month: '2026-10',
+  },
+  {
+    id: 'bg_003',
+    category: 'Transport',
+    limit: 3000.0,
+    spent: 1450.0, // Normal
+    month: '2026-10',
+  },
+  {
+    id: 'bg_004',
+    category: 'Entertainment',
+    limit: 2500.0,
+    spent: 1200.0, // Normal
+    month: '2026-10',
+  },
+  {
+    id: 'bg_005',
+    category: 'Education',
+    limit: 6000.0,
+    spent: 3499.0, // Normal
+    month: '2026-10',
+  },
+];
+
+export const INITIAL_SCAM_DEMOS: ScamCheckResult[] = [
+  {
+    id: 'scm_01',
+    type: 'MESSAGE',
+    inputTarget: 'URGENT: Your bank account will be deactivated today due to incomplete KYC. Update immediately at http://bit.ly/bank-kyc-verify',
+    riskLevel: 'HIGH',
+    riskScore: 92,
+    explainableReasons: [
+      'High-pressure coercive urgency keyword ("URGENT", "deactivated today")',
+      'Unverified generic KYC suspension claim without customer identification',
+      'Uses shortened link masking original destination domain',
+    ],
+    recommendedAction: 'Do not click the link or share OTP/credentials. Legitimate banks never ask for KYC updates over SMS links.',
+    analyzedAt: '2026-10-05T13:40:00+05:30',
+  },
+  {
+    id: 'scm_02',
+    type: 'UPI',
+    inputTarget: 'refund-customer-care-desk@okaxis',
+    riskLevel: 'HIGH',
+    riskScore: 88,
+    explainableReasons: [
+      'Spoofed customer support identity on personal VPA handle',
+      'Commonly observed in fake refund / collect request scams',
+    ],
+    recommendedAction: 'Reject all incoming collect requests from this VPA. Entering your UPI PIN will send money, not receive a refund.',
+    analyzedAt: '2026-10-05T14:15:00+05:30',
+  },
+  {
+    id: 'scm_03',
+    type: 'URL',
+    inputTarget: 'https://official-portal.sbi-rewards-claim.xyz/login',
+    riskLevel: 'HIGH',
+    riskScore: 95,
+    explainableReasons: [
+      'Deceptive subdomain pretending to be State Bank of India',
+      'High-risk low-reputation top-level domain (.xyz)',
+      'Brand impersonation detected on unauthorized hosting origin',
+    ],
+    recommendedAction: 'Block URL immediately. Navigating here risks credential harvesting and credential stuffing.',
+    analyzedAt: '2026-10-05T15:20:00+05:30',
+  },
+];
+
+export const PLANNED_SECURITY_CONTROLS: SecurityControlStatus[] = [
+  {
+    id: 'sec_01',
+    name: 'Bcrypt Password Hashing & Salt Rounds',
+    category: 'AUTHENTICATION',
+    status: 'PLANNED',
+    description: 'Salted cryptographic password hashing with adaptive work factor of 10+ preventing rainbow table attacks.',
+    targetMechanism: 'bcrypt on Node.js backend',
+  },
+  {
+    id: 'sec_02',
+    name: 'Stateless Signed JWT with HttpOnly Cookies',
+    category: 'AUTHENTICATION',
+    status: 'PLANNED',
+    description: 'Signed token storage inside HttpOnly, SameSite=Strict cookies to eliminate client-side token theft via XSS.',
+    targetMechanism: 'jsonwebtoken + cookie-parser',
+  },
+  {
+    id: 'sec_03',
+    name: 'Strict Tenant Isolation (Anti-IDOR / Anti-BOLA)',
+    category: 'AUTHORIZATION',
+    status: 'PLANNED',
+    description: 'Every ledger and budget mutation forces where: { id, userId: req.user.userId } to guarantee cross-tenant isolation.',
+    targetMechanism: 'Express auth middleware + Prisma query scoping',
+  },
+  {
+    id: 'sec_04',
+    name: 'Role-Based Access Control (RBAC)',
+    category: 'AUTHORIZATION',
+    status: 'PLANNED',
+    description: 'Granular USER vs ADMIN privileges protecting platform telemetry and administrative maintenance endpoints.',
+    targetMechanism: 'requireRole middleware handler',
+  },
+  {
+    id: 'sec_05',
+    name: 'Zod Runtime Schema Validation',
+    category: 'INPUT_VALIDATION',
+    status: 'PLANNED',
+    description: 'Strict payload validation stripping unexpected keys, bounds checking numeric limits, and sanitizing text length.',
+    targetMechanism: 'Zod schemas on req.body, req.query, req.params',
+  },
+  {
+    id: 'sec_06',
+    name: 'Parameterized Queries via Prisma ORM',
+    category: 'API_SECURITY',
+    status: 'PLANNED',
+    description: 'All SQL interactions compile to prepared statements, neutralizing SQL injection vectors.',
+    targetMechanism: 'Prisma Client ORM queries',
+  },
+  {
+    id: 'sec_07',
+    name: 'HTTP Security Headers via Helmet',
+    category: 'API_SECURITY',
+    status: 'PLANNED',
+    description: 'Strict Content-Security-Policy, X-Content-Type-Options: nosniff, Frameguard to block clickjacking and MIME attacks.',
+    targetMechanism: 'Helmet Express middleware',
+  },
+  {
+    id: 'sec_08',
+    name: 'API Rate Limiting & Abuse Prevention',
+    category: 'API_SECURITY',
+    status: 'PLANNED',
+    description: 'Throttling authentication attempts (5/15m), AI queries (10/min), and ScamShield scanners (30/min).',
+    targetMechanism: 'express-rate-limit middleware',
+  },
+  {
+    id: 'sec_09',
+    name: 'CSV Formula Injection Neutralization',
+    category: 'DATA_PROTECTION',
+    status: 'PLANNED',
+    description: 'Sanitizing text export cells starting with =, +, -, @ to prevent spreadsheet DDE code execution.',
+    targetMechanism: 'Export streamer single-quote prefixing',
+  },
+  {
+    id: 'sec_10',
+    name: 'Server-Side Isolated AI Provider Broker',
+    category: 'DATA_PROTECTION',
+    status: 'PLANNED',
+    description: 'Client never holds AI credentials; server sanitizes financial context and isolates user prompt boundaries.',
+    targetMechanism: 'Express /api/ai/assistant proxy',
+  },
+  {
+    id: 'sec_11',
+    name: 'Automated Security & Unit Test Suite',
+    category: 'SECURITY_TESTING',
+    status: 'PLANNED',
+    description: 'Automated test suite verifying tenant isolation, auth token expiry, and ReDoS-safe scam regex rules.',
+    targetMechanism: 'Node test runner / Vitest suite',
+  },
+];
