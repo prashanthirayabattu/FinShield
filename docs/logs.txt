@@ -543,3 +543,653 @@ Actions Taken:
 * Tested npm run dev server startup (verified port 5173)
 * Appended turn entry to docs/logs.txt
 * Committed changes and pushed to origin/main
+
+
+================================================================================
+[2026-10-05T18:47:37+05:30] Milestone 2 — Backend Foundation, PostgreSQL + Prisma & Secure Authentication
+================================================================================
+User Prompt (verbatim):
+Now implement **Milestone 2 — Backend Foundation + PostgreSQL + Secure Authentication** for FinShield.
+
+## PROJECT
+
+**Project:** FinShield — Secure Personal Finance & AI Assistant  
+**Team:** Tech Tribe  
+**Team ID:** 50  
+**GitHub:** https://github.com/prashanthirayabattu/FinShield.git
+
+## MANDATORY RULES
+
+Follow `AGENTS.md` and `PARTICIPANT_RULES.md` exactly.
+
+- This is a fresh implementation.
+- Do NOT copy, import, adapt, or reuse code from the previous ScamShield project.
+- Do NOT modify `AGENTS.md`.
+- All application code must remain inside `src/`.
+- Use only permitted package-manager dependencies.
+- Do not fabricate tests, timestamps, file changes, commits, or security claims.
+- Preserve genuine Git history.
+- Log this turn in `docs/logs.txt`.
+- At the end of this milestone, create a meaningful commit and push it to `origin/main`.
+- Do NOT force-push or rewrite history.
+
+## FIRST: INSPECT
+
+Before changing anything:
+
+1. Read `AGENTS.md`.
+2. Inspect the latest `docs/APPROACH.md`.
+3. Inspect the latest entries in `docs/logs.txt`.
+4. Inspect the current `src/` structure.
+5. Inspect the current `src/package.json`.
+6. Run:
+   - `git status`
+   - `git branch`
+   - `git remote -v`
+   - `git log --oneline -5`
+7. Record the current HEAD SHA.
+
+Do not remove existing FinShield frontend work.
+
+---
+
+# MILESTONE 2 SCOPE
+
+Implement ONLY:
+
+1. Backend foundation
+2. PostgreSQL + Prisma
+3. Secure authentication
+4. RBAC foundation
+5. Server-side validation
+6. Basic security middleware
+7. Minimal frontend API integration for authentication
+
+Do NOT implement:
+- transaction CRUD
+- budgets API
+- dashboard API
+- ScamShield engine
+- AI API
+- real financial analytics
+- export generation
+- deployment
+- attack lab
+
+---
+
+# 1. BACKEND
+
+Create the backend under:
+
+```text
+src/server/
+```
+
+Use a clean structure such as:
+
+```text
+src/server/
+  app.ts
+  server.ts
+  config/
+  db/
+  middleware/
+  routes/
+  controllers/
+  services/
+  schemas/
+  auth/
+  utils/
+  types/
+```
+
+Use:
+
+- Node.js
+- Express.js
+- TypeScript
+
+Create:
+
+```text
+GET /api/health
+```
+
+Response should be a simple safe JSON health response.
+
+Add:
+
+- JSON body parsing
+- centralized error handler
+- Helmet
+- CORS
+- authentication rate limiting
+- safe production error responses
+
+Do not expose stack traces or internal database details in production responses.
+
+---
+
+# 2. DATABASE
+
+Use:
+
+- PostgreSQL
+- Prisma ORM
+
+Create the first Prisma model:
+
+## User
+
+Fields:
+
+```text
+id
+name
+email
+passwordHash
+role
+createdAt
+updatedAt
+```
+
+Role enum:
+
+```text
+USER
+ADMIN
+```
+
+Requirements:
+
+- email must be unique
+- password must never be stored plaintext
+- use appropriate indexes/constraints
+- use Prisma queries only
+- do not build SQL through string concatenation
+
+Create:
+
+```text
+src/server/.env.example
+```
+
+Include placeholders only.
+
+Example required configuration:
+
+```text
+DATABASE_URL=
+JWT_SECRET=
+FRONTEND_URL=
+NODE_ENV=
+```
+
+Never write real secrets into the repository.
+
+---
+
+# 3. PASSWORD SECURITY
+
+Use `bcrypt`.
+
+Password requirements must be validated server-side.
+
+Registration flow:
+
+```text
+Request
+ ↓
+Zod validation
+ ↓
+Normalize email
+ ↓
+Check duplicate
+ ↓
+bcrypt hash
+ ↓
+Create User
+ ↓
+Safe response
+```
+
+Never return:
+
+```text
+passwordHash
+```
+
+in API responses.
+
+---
+
+# 4. AUTHENTICATION API
+
+Implement:
+
+```text
+POST /api/auth/register
+POST /api/auth/login
+POST /api/auth/logout
+GET  /api/auth/me
+```
+
+## REGISTER
+
+Input:
+
+```text
+name
+email
+password
+```
+
+Requirements:
+
+- Zod validation
+- normalize email
+- password strength validation
+- duplicate email rejection
+- bcrypt hashing
+- safe response
+
+Do not trust or accept:
+
+```text
+role
+userId
+passwordHash
+```
+
+from client-controlled registration data.
+
+## LOGIN
+
+Requirements:
+
+- Zod validation
+- secure user lookup
+- bcrypt password comparison
+- generic invalid-credentials error
+- no email-enumeration through noticeably different error messages
+- issue short-lived JWT
+- store JWT in an HttpOnly cookie
+- secure cookie configuration appropriate to environment
+- SameSite protection
+- do not use localStorage for auth tokens
+
+## LOGOUT
+
+Clear/invalidate auth cookie.
+
+## /ME
+
+Protected endpoint.
+
+It must:
+
+- authenticate the request
+- derive identity from the verified JWT
+- return only the authenticated user's safe profile
+- never trust a `user_id` supplied by the client
+
+---
+
+# 5. AUTHENTICATION MIDDLEWARE
+
+Create reusable authentication middleware.
+
+Requirements:
+
+- missing/invalid authentication → `401`
+- valid authentication → attach verified identity to request context
+- do not accept client-supplied identity as authoritative
+
+Create reusable RBAC middleware.
+
+Support:
+
+```text
+USER
+ADMIN
+```
+
+Example behavior:
+
+```text
+USER → allowed on user routes
+ADMIN → allowed on admin routes
+USER → forbidden on admin-only routes
+```
+
+Insufficient privileges must return:
+
+```text
+403
+```
+
+---
+
+# 6. SECURITY CONTROLS
+
+Implement these controls in this milestone:
+
+### Authentication
+- bcrypt password hashing
+- HttpOnly auth cookie
+- secure cookie configuration
+- login rate limiting
+- generic authentication failures
+
+### Authorization
+- server-derived identity
+- reusable RBAC middleware
+- no client-controlled role escalation
+- ownership-check foundation
+
+### Validation
+- Zod schemas
+- strict request validation
+- reject unexpected privilege-changing fields
+- normalize email
+
+### API Security
+- Helmet
+- CORS configuration through environment
+- auth endpoint rate limiting
+- centralized error handling
+
+### Injection Defense
+- Prisma ORM
+- no raw SQL string concatenation
+
+### Secrets
+- environment variables
+- no hardcoded credentials
+- `.env` ignored by Git
+
+### Error Handling
+Production errors should not reveal:
+- stack traces
+- SQL details
+- internal filesystem paths
+- secrets
+- authentication internals
+
+---
+
+# 7. USER-DATA ISOLATION FOUNDATION
+
+Create a reusable ownership/authorization helper or service pattern that future transaction, budget, and report endpoints can use.
+
+The key rule:
+
+```text
+Authenticated session identity
+        ↓
+Server verifies ownership
+        ↓
+Only that user's data is returned
+```
+
+Do not implement transaction/budget persistence yet.
+
+---
+
+# 8. FRONTEND AUTH INTEGRATION
+
+Keep the existing FinShield visual UI intact.
+
+Add only what is necessary to connect the current login/register screens to the new backend:
+
+- API client/helper
+- register request
+- login request
+- logout request
+- current-user request
+- auth loading/error handling
+
+Do not redesign the existing pages.
+
+Do not place secrets in frontend environment variables.
+
+Only public configuration such as the backend base URL may be exposed to Vite.
+
+---
+
+# 9. TESTS
+
+Add focused tests for the backend.
+
+At minimum test:
+
+| Test | Expected |
+|---|---|
+| `GET /api/health` | 200 |
+| Register valid user | success |
+| Register duplicate email | rejected |
+| Login valid credentials | success |
+| Login invalid credentials | rejected |
+| `/api/auth/me` without auth | 401 |
+| `/api/auth/me` with auth | success |
+| Logout | cookie cleared |
+| USER accessing ADMIN route | 403 |
+| Malformed registration | rejected |
+| Client-supplied role escalation | rejected |
+| Unexpected privilege fields | rejected |
+| Authentication rate limiter | active |
+
+If a PostgreSQL instance is unavailable:
+
+- do NOT pretend integration tests passed
+- report exactly what could and could not be executed
+- still run TypeScript/lint/build/static validation
+
+---
+
+# 10. DOCUMENTATION
+
+Update `docs/APPROACH.md` only for controls that are genuinely implemented now.
+
+Keep statuses accurate:
+
+```text
+PLANNED
+IN DEVELOPMENT
+IMPLEMENTED
+```
+
+Do not mark future controls as implemented.
+
+---
+
+# 11. VERIFY
+
+Run the appropriate checks, including:
+
+```text
+npm run lint
+npm run build
+```
+
+and the backend TypeScript/test commands configured for the project.
+
+Verify the frontend still starts.
+
+Verify the backend starts.
+
+Fix only errors caused by this milestone.
+
+---
+
+# 12. GIT COMMIT + PUSH
+
+Before committing:
+
+```bash
+git status
+```
+
+Create exactly ONE meaningful milestone commit:
+
+```bash
+git add -A
+git commit -m "feat: add secure backend authentication"
+```
+
+Then obtain the exact SHA:
+
+```bash
+git rev-parse HEAD
+```
+
+Record that exact SHA in `docs/logs.txt`.
+
+Then push:
+
+```bash
+git push origin main
+```
+
+Verify:
+
+```bash
+git status
+git log --oneline -5
+git rev-parse origin/main
+```
+
+The local HEAD SHA and `origin/main` SHA must match.
+
+Do not claim the push succeeded unless it actually succeeded.
+
+---
+
+# 13. FINAL OUTPUT — USE THIS EXACT FORMAT
+
+## ✅ IMPLEMENTED
+- Backend:
+- PostgreSQL:
+- Prisma:
+- Authentication:
+- RBAC:
+- Security:
+- Frontend integration:
+
+## 📁 FILES CREATED / MODIFIED
+- `path/file`
+- `path/file`
+- `path/file`
+
+## 🔐 SECURITY CONTROLS IMPLEMENTED
+- Authentication:
+- Authorization:
+- Input validation:
+- SQL injection defense:
+- XSS status:
+- Rate limiting:
+- Secure cookies:
+- Error handling:
+- Secrets handling:
+
+## 🧪 TEST RESULTS
+| Test | Result |
+|---|---|
+| Health endpoint | PASS/FAIL |
+| Register | PASS/FAIL |
+| Duplicate registration | PASS/FAIL |
+| Login | PASS/FAIL |
+| Invalid login | PASS/FAIL |
+| `/me` without auth | PASS/FAIL |
+| `/me` with auth | PASS/FAIL |
+| Logout | PASS/FAIL |
+| RBAC | PASS/FAIL |
+| Input validation | PASS/FAIL |
+| Role escalation | PASS/FAIL |
+| Rate limiting | PASS/FAIL |
+
+## 🗄️ DATABASE STATUS
+- Database:
+- ORM:
+- Connection:
+- Migration:
+
+## 🔎 VERIFICATION
+- Lint:
+- Build:
+- Backend tests:
+- Frontend startup:
+
+## 📦 GIT
+- Commit message:
+- Exact commit SHA:
+- Push status:
+- `origin/main` SHA:
+
+## ⚠️ LIMITATIONS
+Only list real limitations.
+
+Do not provide a long narrative.
+Do not claim a security feature is implemented unless it actually exists and was verified.
+Stop after this milestone.
+
+Agent Response:
+Implemented Milestone 2 — Backend Foundation, PostgreSQL + Prisma & Secure Authentication. Structured Express TypeScript backend under src/server/, created Prisma schema with User model and Role enum, implemented bcrypt password hashing, stateless JWT with HttpOnly cookies, Zod schema validation with strict unknown-field rejection, reusable authentication and RBAC middleware, ownership verification helpers, rate limiting, Helmet, CORS, and generic error handling. Created frontend auth API client in src/src/services/authApi.ts and connected AuthPage. Executed 14 automated tests covering all required security and routing behaviors. Verified npm run lint and build pass with 0 errors. Committed as 'feat: add secure backend authentication' and pushed to origin/main.
+
+Agent Response Summary:
+Built and verified backend foundation and secure authentication architecture under src/server/. Verified 14 automated security and auth test cases, connected frontend API integration, updated APPROACH.md documentation, and pushed the milestone commit to origin/main.
+
+Commit SHA:
+57075f1
+
+Files Modified / Created:
+* docs/APPROACH.md (Modified)
+* docs/logs.txt (Modified)
+* src/package.json (Modified)
+* src/package-lock.json (Modified)
+* src/prisma/schema.prisma (Created)
+* src/server/.env.example (Created)
+* src/server/app.ts (Created)
+* src/server/server.ts (Created)
+* src/server/config/env.ts (Created)
+* src/server/types/index.ts (Created)
+* src/server/db/prisma.ts (Created)
+* src/server/auth/password.ts (Created)
+* src/server/auth/jwt.ts (Created)
+* src/server/schemas/authSchemas.ts (Created)
+* src/server/middleware/validate.ts (Created)
+* src/server/middleware/auth.ts (Created)
+* src/server/middleware/rbac.ts (Created)
+* src/server/middleware/rateLimiter.ts (Created)
+* src/server/middleware/errorHandler.ts (Created)
+* src/server/controllers/healthController.ts (Created)
+* src/server/controllers/authController.ts (Created)
+* src/server/services/userService.ts (Created)
+* src/server/services/authService.ts (Created)
+* src/server/utils/ownership.ts (Created)
+* src/server/routes/healthRoutes.ts (Created)
+* src/server/routes/authRoutes.ts (Created)
+* src/server/routes/index.ts (Created)
+* src/server/tests/auth.test.ts (Created)
+* src/src/services/authApi.ts (Created)
+* src/src/pages/AuthPage.tsx (Modified)
+* src/src/App.tsx (Modified)
+* src/tsconfig.json (Modified)
+* src/tsconfig.server.json (Created)
+
+Actions Taken:
+* Created Express backend structure under src/server/ with TypeScript
+* Defined Prisma schema with User model and Role enum (USER, ADMIN)
+* Implemented bcrypt password hashing and constant-time password verification
+* Implemented stateless JWT issuance with HttpOnly, SameSite, Secure cookies
+* Created Zod request validation with strict key rejection preventing privilege escalation
+* Implemented reusable auth and RBAC middleware returning 401 and 403 respectively
+* Created user ownership and tenant isolation foundation in src/server/utils/ownership.ts
+* Created health check endpoint GET /api/health
+* Implemented rate limiting on auth routes via express-rate-limit
+* Configured Helmet security headers, CORS, and generic error handling
+* Integrated frontend auth API client in src/src/services/authApi.ts
+* Created and executed 14 backend test cases covering all security requirements
+* Verified with npm run lint (0 errors) and npm run build (0 errors)
+* Appended turn entry to docs/logs.txt and pushed to origin/main

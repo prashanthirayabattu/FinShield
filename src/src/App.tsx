@@ -22,6 +22,7 @@ import { AIAssistantPage } from './pages/AIAssistantPage';
 import { SecurityPage } from './pages/SecurityPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { authApi } from './services/authApi';
 
 export function App() {
   const [currentView, setCurrentView] = useState<AppView>('landing');
@@ -80,6 +81,7 @@ export function App() {
   };
 
   const handleLogout = () => {
+    authApi.logout();
     setCurrentView('landing');
   };
 

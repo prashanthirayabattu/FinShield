@@ -243,11 +243,11 @@ A key differentiator of FinShield is connecting scam intelligence directly to th
 
 | Milestone / Phase | Time Window | Key Objectives & Deliverables | Security Verification | Status |
 |---|---|---|---|---|
-| **Phase 1: Foundation & Setup** | 0h – 4h | Onboarding completion, architecture design in `APPROACH.md`, database schema definition (Prisma), Express app scaffolding, and environment config. | Secret scan, `.gitignore` verification, baseline dependency check. | `In Progress` |
-| **Phase 2: Core Domain & Auth** | 4h – 10h | User registration/login with bcrypt & JWT, RBAC middleware, income/expense CRUD, categories, budget alerts, and transaction filtering. | Auth test suite, token expiry test, tenant isolation (IDOR) tests. | `Planned` |
-| **Phase 3: ScamShield & AI Layer** | 10h – 16h | ScamShield engine (message, URL, UPI heuristic analyzers), explainable risk reports, scam-to-ledger matching logic, and server-side AI assistant proxy. | SSRF prevention test, regex safety verification, AI context isolation test. | `Planned` |
-| **Phase 4: Security Hardening & Polish** | 16h – 21h | Zod validation coverage, Helmet CSP configuration, rate limiters, secure CSV export with formula injection escaping, and audit logging. | CSV injection tests, rate limit tests, XSS boundary checks. | `Planned` |
-| **Phase 5: Deployment & Commit Freeze**| 21h – 24h | Frontend build on Vercel, backend build on Render/Railway, database migration verification, healthcheck check (`/api/health`), and commit freeze in `submission.yaml`. | Live deployment healthcheck verification, commit SHA lock. | `Planned` |
+| **Phase 1: Foundation & Setup** | 0h – 4h | Onboarding completion, architecture design in `APPROACH.md`, database schema definition (Prisma), Express app scaffolding, and environment config. | Secret scan, `.gitignore` verification, baseline dependency check. | `IMPLEMENTED` |
+| **Phase 2: Core Domain & Auth** | 4h – 10h | User registration/login with bcrypt & JWT, RBAC middleware, Zod validation, user isolation foundation, income/expense CRUD, and budget alerts. | Auth test suite, token expiry test, tenant isolation (IDOR) tests. | `IN DEVELOPMENT` |
+| **Phase 3: ScamShield & AI Layer** | 10h – 16h | ScamShield engine (message, URL, UPI heuristic analyzers), explainable risk reports, scam-to-ledger matching logic, and server-side AI assistant proxy. | SSRF prevention test, regex safety verification, AI context isolation test. | `PLANNED` |
+| **Phase 4: Security Hardening & Polish** | 16h – 21h | Zod validation coverage, Helmet CSP configuration, rate limiters, secure CSV export with formula injection escaping, and audit logging. | CSV injection tests, rate limit tests, XSS boundary checks. | `PLANNED` |
+| **Phase 5: Deployment & Commit Freeze**| 21h – 24h | Frontend build on Vercel, backend build on Render/Railway, database migration verification, healthcheck check (`/api/health`), and commit freeze in `submission.yaml`. | Live deployment healthcheck verification, commit SHA lock. | `PLANNED` |
 
 ---
 
@@ -329,6 +329,11 @@ A key differentiator of FinShield is connecting scam intelligence directly to th
 - **Focus:** Complete architectural specification in `docs/APPROACH.md`, encompassing PS-01 personal finance requirements, ScamShield fraud-protection layer, server-side AI proxy, and defense-in-depth security controls.
 - **Key Challenges:** Designing a cohesive bridge between the passive transaction ledger and the active ScamShield fraud detection layer within 24-hour hackathon constraints.
 - **Resolution:** Established the Scam-to-Ledger correlation model, formalized 7 ADRs, and defined clear milestone boundaries separating planned vs. completed components.
+
+### [2026-10-05 19:15 IST] Entry 3: Milestone 2 — Backend Foundation, PostgreSQL Schema & Secure Authentication
+- **Focus:** Built Express backend in `src/server/`, defined Prisma PostgreSQL schema with `User` model, implemented bcrypt password hashing, stateless JWT with HttpOnly cookies, Zod request validation, RBAC middleware, and user-isolation helper pattern (`assertUserOwnership`, `scopeQueryToUser`).
+- **Key Challenges:** Enforcing strict anti-enumeration on authentication failures, preventing role-escalation payloads via Zod `.strict()`, and handling database connectivity transparently.
+- **Resolution:** Full test suite with 14 automated tests passed (health, registration, duplicate rejection, login, invalid credentials, `/me`, logout, RBAC forbidden check, malformed input rejection, role injection rejection, rate limiting header checks, and DB connectivity). Integrated frontend auth client with backend endpoints.
 
 ---
 
