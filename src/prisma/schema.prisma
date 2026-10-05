@@ -29,6 +29,7 @@ model User {
   updatedAt    DateTime      @updatedAt
   transactions Transaction[]
   budgets      Budget[]
+  scamAnalyses ScamAnalysis[]
 
   @@index([email])
   @@map("users")
@@ -70,4 +71,21 @@ model Budget {
   @@index([userId, month])
   @@map("budgets")
 }
+
+model ScamAnalysis {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  riskLevel      String
+  riskScore      Int
+  category       String
+  extractedUpiId String?
+  sourceType     String
+  createdAt      DateTime @default(now())
+
+  @@index([userId])
+  @@index([userId, riskLevel])
+  @@map("scam_analyses")
+}
+
 

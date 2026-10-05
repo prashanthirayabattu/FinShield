@@ -361,6 +361,18 @@ A key differentiator of FinShield is connecting scam intelligence directly to th
   - Configured sequential test execution (`--test-concurrency=1`) preserving isolated test state. All 42 automated test assertions passed across 4 test suites with zero failures. Database row counts confirmed at 0 after teardown.
   - Connected frontend `BudgetsPage` (edit/delete/progress/alerts) and `DashboardPage` (live statistics/breakdown/alerts) to live backend endpoints.
 
+### [2026-10-05 22:35 IST] Entry 9: Milestone 7 — ScamShield Fraud Analysis Engine & Ledger Linking
+- **Focus:** Implemented the ScamShield fraud-analysis layer integrated into FinShield. Built deterministic rule-based heuristic inspection for suspicious payment messages, URLs, and UPI IDs. Designed SSRF-safe URL lexical analysis (executing zero outbound HTTP network requests). Implemented UPI ID extraction and monetary amount extraction. Implemented deterministic scoring (`LOW` 0–29, `MEDIUM` 30–59, `HIGH` 60–100) with explainable reasons and tailored security recommendations. Integrated scoped ledger transaction matching connecting analyzed fraud markers to the authenticated user's real transactions in Neon PostgreSQL (`where: { userId: req.user.id }`). Added persistent audit trail model `ScamAnalysis` in PostgreSQL via migration `20261005223000_add_scam_analysis`. Built full frontend UI in `ScamShieldPage.tsx` with live backend API calls, preset buttons, explainable indicators, and matched ledger transaction alerts.
+- **Key Challenges:**
+  - Preventing SSRF vulnerabilities when inspecting user-submitted URLs: Eliminated any outbound network requests by evaluating URLs purely through lexical parser inspection of protocol, high-risk TLDs, IP literals, URL shorteners, and financial brand spoofing keywords.
+  - Ensuring tenant data isolation during ledger matching: Guaranteeing that when an analysis matches a UPI ID or monetary amount, User B never sees User A's transactions (tested and verified zero cross-tenant leakage).
+  - Preventing ReDoS and payload abuse: Enforced strict Zod validation with upper bounds (max 5000 characters for message text, max 2000 for URL, max 256 for UPI), `.strict()` mass-assignment rejection, and linear-time heuristic regex matching.
+- **Resolution:**
+  - Designed `ScamService` (`src/server/services/scamService.ts`), `analyzeScamSchema` (`src/server/schemas/scamSchemas.ts`), `scamController.ts`, and mounted routes under `/api/scamshield/analyze` and `/api/scamshield/history`.
+  - Authoritative 14-test integration suite in `src/server/tests/scamshield.test.ts` covering KYC urgency, OTP/PIN credential harvesting, utility disconnection extortion, part-time job lures, benign messages, SSRF-safe URL inspection, UPI and amount extraction, empty/oversized/mass-assignment payload rejection, 401 unauthenticated protection, scoped ledger transaction linking, and cross-user tenant isolation.
+  - All 56 automated test assertions across all 5 test suites pass with zero failures against live Neon PostgreSQL. All test records cleanly torn down with database row counts verified at 0.
+  - Updated frontend `ScamShieldPage.tsx` to communicate with the live backend, presenting real-time risk scores, category chips, extracted parameters, explainable indicators, protective recommendations, and ledger matching warning cards.
+
 ---
 
 

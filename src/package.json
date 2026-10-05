@@ -8,11 +8,12 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "tsx --test --test-concurrency=1 server/tests/auth.test.ts server/tests/dbIntegration.test.ts server/tests/transactionIdor.test.ts server/tests/budgetDashboard.test.ts",
+    "test": "tsx --test --test-concurrency=1 server/tests/auth.test.ts server/tests/dbIntegration.test.ts server/tests/transactionIdor.test.ts server/tests/budgetDashboard.test.ts server/tests/scamshield.test.ts",
     "test:auth": "tsx --test server/tests/auth.test.ts",
     "test:db": "tsx --test server/tests/dbIntegration.test.ts",
     "test:idor": "tsx --test server/tests/transactionIdor.test.ts",
     "test:budget": "tsx --test server/tests/budgetDashboard.test.ts",
+    "test:scam": "tsx --test server/tests/scamshield.test.ts",
     "db:check": "tsx server/scripts/checkDb.ts"
   },
   "dependencies": {

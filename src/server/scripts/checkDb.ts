@@ -16,12 +16,13 @@ async function main() {
       const tables = await prisma.$queryRaw<Array<{ table_name: string }>>`
         SELECT table_name 
         FROM information_schema.tables 
-        WHERE table_schema = 'public' AND table_name IN ('users', 'transactions', 'budgets');
+        WHERE table_schema = 'public' AND table_name IN ('users', 'transactions', 'budgets', 'scam_analyses');
       `;
 
       const hasUsersTable = tables.some((t) => t.table_name === 'users');
       const hasTransactionsTable = tables.some((t) => t.table_name === 'transactions');
       const hasBudgetsTable = tables.some((t) => t.table_name === 'budgets');
+      const hasScamAnalysesTable = tables.some((t) => t.table_name === 'scam_analyses');
 
       if (hasUsersTable) {
         console.log('✅ Table "users": FOUND in public schema');
@@ -39,6 +40,12 @@ async function main() {
         console.log('✅ Table "budgets": FOUND in public schema');
       } else {
         console.log('⚠️  Table "budgets": NOT FOUND');
+      }
+
+      if (hasScamAnalysesTable) {
+        console.log('✅ Table "scam_analyses": FOUND in public schema');
+      } else {
+        console.log('⚠️  Table "scam_analyses": NOT FOUND');
       }
 
       // 2. Check Enums
@@ -63,23 +70,27 @@ async function main() {
         SELECT constraint_name 
         FROM information_schema.table_constraints 
         WHERE table_schema = 'public' 
-          AND table_name IN ('transactions', 'budgets') 
+          AND table_name IN ('transactions', 'budgets', 'scam_analyses') 
           AND constraint_type = 'FOREIGN KEY';
       `;
       const hasTxUserFkey = foreignKeys.some((fk) => fk.constraint_name === 'transactions_userId_fkey');
       const hasBudgetFkey = foreignKeys.some((fk) => fk.constraint_name === 'budgets_userId_fkey');
+      const hasScamUserFkey = foreignKeys.some((fk) => fk.constraint_name === 'scam_analyses_userId_fkey');
       if (hasTxUserFkey) {
         console.log('✅ Foreign Key "transactions_userId_fkey": VERIFIED');
       }
       if (hasBudgetFkey) {
         console.log('✅ Foreign Key "budgets_userId_fkey": VERIFIED');
       }
+      if (hasScamUserFkey) {
+        console.log('✅ Foreign Key "scam_analyses_userId_fkey": VERIFIED');
+      }
 
       // 4. Check Indexes and Unique Constraints
       const indexes = await prisma.$queryRaw<Array<{ tablename: string; indexname: string }>>`
         SELECT tablename, indexname 
         FROM pg_indexes 
-        WHERE tablename IN ('users', 'transactions', 'budgets');
+        WHERE tablename IN ('users', 'transactions', 'budgets', 'scam_analyses');
       `;
 
       const hasUniqueEmail = indexes.some((idx) => idx.indexname === 'users_email_key');
@@ -91,6 +102,8 @@ async function main() {
       const hasBudgetUserIdx = indexes.some((idx) => idx.indexname === 'budgets_userId_idx');
       const hasBudgetUserCategoryIdx = indexes.some((idx) => idx.indexname === 'budgets_userId_category_idx');
       const hasBudgetUserMonthIdx = indexes.some((idx) => idx.indexname === 'budgets_userId_month_idx');
+      const hasScamUserIdx = indexes.some((idx) => idx.indexname === 'scam_analyses_userId_idx');
+      const hasScamUserRiskIdx = indexes.some((idx) => idx.indexname === 'scam_analyses_userId_riskLevel_idx');
 
       if (hasUniqueEmail) {
         console.log('✅ Unique constraint "users_email_key": VERIFIED');
@@ -119,13 +132,21 @@ async function main() {
       if (hasBudgetUserMonthIdx) {
         console.log('✅ Index "budgets_userId_month_idx": VERIFIED');
       }
+      if (hasScamUserIdx) {
+        console.log('✅ Index "scam_analyses_userId_idx": VERIFIED');
+      }
+      if (hasScamUserRiskIdx) {
+        console.log('✅ Index "scam_analyses_userId_riskLevel_idx": VERIFIED');
+      }
 
       const userCount = await prisma.user.count();
       const txCount = await prisma.transaction.count();
       const budgetCount = await prisma.budget.count();
+      const scamCount = await prisma.scamAnalysis.count();
       console.log(`📊 Current registered user count: ${userCount}`);
       console.log(`📊 Current transaction count: ${txCount}`);
       console.log(`📊 Current budget count: ${budgetCount}`);
+      console.log(`📊 Current scam analysis count: ${scamCount}`);
     } catch (err: unknown) {
       console.error('Error querying schema details:', err);
     }
