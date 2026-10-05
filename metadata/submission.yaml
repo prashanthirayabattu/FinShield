@@ -4,8 +4,8 @@
 version: "1.0"
 
 submission:
-  team_id: ""
-  repository: ""
+  team_id: "50"
+  repository: "https://github.com/prashanthirayabattu/FinShield.git"
   commit_sha: ""
   deployment_url: ""
   submitted_at: ""
