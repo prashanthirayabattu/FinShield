@@ -12,70 +12,96 @@ async function main() {
     console.log('✅ Connection to PostgreSQL: SUCCESS');
 
     try {
-      // 1. Check if users table exists in public schema
+      // 1. Check tables
       const tables = await prisma.$queryRaw<Array<{ table_name: string }>>`
         SELECT table_name 
         FROM information_schema.tables 
-        WHERE table_schema = 'public' AND table_name = 'users';
+        WHERE table_schema = 'public' AND table_name IN ('users', 'transactions');
       `;
 
-      if (tables.length > 0) {
+      const hasUsersTable = tables.some((t) => t.table_name === 'users');
+      const hasTransactionsTable = tables.some((t) => t.table_name === 'transactions');
+
+      if (hasUsersTable) {
         console.log('✅ Table "users": FOUND in public schema');
       } else {
-        console.log('⚠️  Table "users": NOT FOUND. Pending migration execution.');
+        console.log('⚠️  Table "users": NOT FOUND');
       }
 
-      // 2. Check if Role enum exists in pg_type
+      if (hasTransactionsTable) {
+        console.log('✅ Table "transactions": FOUND in public schema');
+      } else {
+        console.log('⚠️  Table "transactions": NOT FOUND');
+      }
+
+      // 2. Check Enums
       const enums = await prisma.$queryRaw<Array<{ typname: string }>>`
         SELECT typname 
         FROM pg_type 
-        WHERE typname = 'Role';
+        WHERE typname IN ('Role', 'TransactionType');
       `;
 
-      if (enums.length > 0) {
+      const hasRoleEnum = enums.some((e) => e.typname === 'Role');
+      const hasTypeEnum = enums.some((e) => e.typname === 'TransactionType');
+
+      if (hasRoleEnum) {
         console.log('✅ Enum "Role": FOUND in pg_type (USER, ADMIN)');
-      } else {
-        console.log('⚠️  Enum "Role": NOT FOUND. Pending migration execution.');
+      }
+      if (hasTypeEnum) {
+        console.log('✅ Enum "TransactionType": FOUND in pg_type (INCOME, EXPENSE)');
       }
 
-      // 3. Check for unique index on users.email
-      const indexes = await prisma.$queryRaw<Array<{ indexname: string; indexdef: string }>>`
-        SELECT indexname, indexdef 
+      // 3. Check Foreign Keys on transactions table
+      const foreignKeys = await prisma.$queryRaw<Array<{ constraint_name: string }>>`
+        SELECT constraint_name 
+        FROM information_schema.table_constraints 
+        WHERE table_schema = 'public' 
+          AND table_name = 'transactions' 
+          AND constraint_type = 'FOREIGN KEY';
+      `;
+      const hasUserFkey = foreignKeys.some((fk) => fk.constraint_name === 'transactions_userId_fkey');
+      if (hasUserFkey) {
+        console.log('✅ Foreign Key "transactions_userId_fkey": VERIFIED');
+      }
+
+      // 4. Check Indexes
+      const indexes = await prisma.$queryRaw<Array<{ tablename: string; indexname: string }>>`
+        SELECT tablename, indexname 
         FROM pg_indexes 
-        WHERE tablename = 'users';
+        WHERE tablename IN ('users', 'transactions');
       `;
 
-      const hasUniqueEmail = indexes.some(
-        (idx) => idx.indexname === 'users_email_key' || idx.indexdef.includes('UNIQUE')
-      );
-      const hasEmailIdx = indexes.some((idx) => idx.indexname === 'users_email_idx');
+      const hasUniqueEmail = indexes.some((idx) => idx.indexname === 'users_email_key');
+      const hasUserIdx = indexes.some((idx) => idx.indexname === 'transactions_userId_idx');
+      const hasUserDateIdx = indexes.some((idx) => idx.indexname === 'transactions_userId_transactionDate_idx');
+      const hasUserTypeIdx = indexes.some((idx) => idx.indexname === 'transactions_userId_type_idx');
+      const hasUserCategoryIdx = indexes.some((idx) => idx.indexname === 'transactions_userId_category_idx');
 
       if (hasUniqueEmail) {
         console.log('✅ Unique constraint "users_email_key": VERIFIED');
       }
-      if (hasEmailIdx) {
-        console.log('✅ Secondary index "users_email_idx": VERIFIED');
+      if (hasUserIdx) {
+        console.log('✅ Index "transactions_userId_idx": VERIFIED');
+      }
+      if (hasUserDateIdx) {
+        console.log('✅ Index "transactions_userId_transactionDate_idx": VERIFIED');
+      }
+      if (hasUserTypeIdx) {
+        console.log('✅ Index "transactions_userId_type_idx": VERIFIED');
+      }
+      if (hasUserCategoryIdx) {
+        console.log('✅ Index "transactions_userId_category_idx": VERIFIED');
       }
 
       const userCount = await prisma.user.count();
-      console.log(`📊 Current registered user count in database: ${userCount}`);
+      const txCount = await prisma.transaction.count();
+      console.log(`📊 Current registered user count: ${userCount}`);
+      console.log(`📊 Current transaction count: ${txCount}`);
     } catch (err: unknown) {
       console.error('Error querying schema details:', err);
     }
   } else {
     console.log('❌ Connection to PostgreSQL: FAILED / NOT REACHABLE');
-    console.log('\nDiagnostic Details:');
-    console.log('- No live PostgreSQL service responded on the configured DATABASE_URL.');
-    console.log('- Local fallback in-memory store remains active to prevent server crashes.');
-    console.log('\nTo connect to a real PostgreSQL instance:');
-    console.log('1. Create or update `src/server/.env` with your PostgreSQL connection string:');
-    console.log('   DATABASE_URL="postgresql://user:password@host:5432/finshield?schema=public"');
-    console.log('2. For cloud PostgreSQL (e.g. Neon, Supabase, Render):');
-    console.log('   DATABASE_URL="postgresql://<user>:<password>@<host>:5432/<dbname>?sslmode=require"');
-    console.log('3. Once configured, apply migrations:');
-    console.log('   npx prisma migrate deploy --schema=src/prisma/schema.prisma');
-    console.log('4. Verify with:');
-    console.log('   npm --prefix src run db:check');
   }
 
   await prisma.$disconnect();

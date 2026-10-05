@@ -14,9 +14,12 @@ import { Modal } from '../components/Modal';
 
 interface TransactionsPageProps {
   transactions: Transaction[];
+  isLoading?: boolean;
+  error?: string | null;
   onAddTransaction: (tx: Omit<Transaction, 'id'>) => void;
   onEditTransaction: (tx: Transaction) => void;
   onDeleteTransaction: (id: string) => void;
+  onRefresh?: () => void;
 }
 
 const CATEGORIES: TransactionCategory[] = [
@@ -32,9 +35,12 @@ const CATEGORIES: TransactionCategory[] = [
 
 export const TransactionsPage: React.FC<TransactionsPageProps> = ({
   transactions,
+  isLoading = false,
+  error = null,
   onAddTransaction,
   onEditTransaction,
   onDeleteTransaction,
+  onRefresh,
 }) => {
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState('');
@@ -147,6 +153,24 @@ export const TransactionsPage: React.FC<TransactionsPageProps> = ({
         </button>
       </div>
 
+      {/* Error Alert Banner */}
+      {error && (
+        <div className="p-3.5 rounded-xl bg-red-950/40 border border-red-800/60 text-xs text-red-300 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400" />
+            <span>{error}</span>
+          </div>
+          {onRefresh && (
+            <button
+              onClick={onRefresh}
+              className="text-cyan-400 hover:underline font-mono text-xs ml-3"
+            >
+              Retry Sync
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Filter and Search Bar */}
       <div className="bg-[#0c1322] border border-slate-800 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {/* Search Input */}
@@ -220,7 +244,16 @@ export const TransactionsPage: React.FC<TransactionsPageProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60">
-              {filtered.length === 0 ? (
+              {isLoading ? (
+                <tr>
+                  <td colSpan={8} className="py-12 text-center text-slate-400">
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-4 h-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+                      Loading transactions from secure ledger...
+                    </div>
+                  </td>
+                </tr>
+              ) : filtered.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="py-12 text-center text-slate-500">
                     No transactions match the selected filter criteria.

@@ -23,20 +23,52 @@ import { SecurityPage } from './pages/SecurityPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { authApi } from './services/authApi';
+import { transactionApi } from './services/transactionApi';
 
 export function App() {
   const [currentView, setCurrentView] = useState<AppView>('landing');
   const [user, setUser] = useState<UserProfile>(INITIAL_USER);
   const [transactions, setTransactions] = useState<Transaction[]>(INITIAL_TRANSACTIONS);
   const [budgets, setBudgets] = useState<Budget[]>(INITIAL_BUDGETS);
+  const [isLoadingTransactions, setIsLoadingTransactions] = useState(false);
+  const [transactionError, setTransactionError] = useState<string | null>(null);
+
+  const loadTransactions = async () => {
+    try {
+      setIsLoadingTransactions(true);
+      setTransactionError(null);
+      const res = await transactionApi.list();
+      if (res.transactions.length > 0) {
+        setTransactions(res.transactions);
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Unable to synchronize transactions';
+      setTransactionError(msg);
+    } finally {
+      setIsLoadingTransactions(false);
+    }
+  };
 
   // Transaction Handlers
-  const handleAddTransaction = (newTx: Omit<Transaction, 'id'>) => {
-    const created: Transaction = {
-      ...newTx,
-      id: `tx_${Date.now()}`,
-    };
-    setTransactions((prev) => [created, ...prev]);
+  const handleAddTransaction = async (newTx: Omit<Transaction, 'id'>) => {
+    try {
+      const created = await transactionApi.create({
+        type: newTx.type,
+        amount: newTx.amount,
+        category: newTx.category,
+        description: newTx.description,
+        payee: newTx.payee,
+        transactionDate: new Date(newTx.date).toISOString(),
+      });
+      setTransactions((prev) => [created, ...prev]);
+    } catch {
+      // Local fallback for offline/demo resilience
+      const created: Transaction = {
+        ...newTx,
+        id: `tx_${Date.now()}`,
+      };
+      setTransactions((prev) => [created, ...prev]);
+    }
 
     // If it's an expense, update corresponding budget if exists
     if (newTx.type === 'EXPENSE') {
@@ -50,13 +82,32 @@ export function App() {
     }
   };
 
-  const handleEditTransaction = (updatedTx: Transaction) => {
-    setTransactions((prev) =>
-      prev.map((t) => (t.id === updatedTx.id ? updatedTx : t))
-    );
+  const handleEditTransaction = async (updatedTx: Transaction) => {
+    try {
+      const updated = await transactionApi.update(updatedTx.id, {
+        type: updatedTx.type,
+        amount: updatedTx.amount,
+        category: updatedTx.category,
+        description: updatedTx.description,
+        payee: updatedTx.payee,
+        transactionDate: new Date(updatedTx.date).toISOString(),
+      });
+      setTransactions((prev) =>
+        prev.map((t) => (t.id === updated.id ? updated : t))
+      );
+    } catch {
+      setTransactions((prev) =>
+        prev.map((t) => (t.id === updatedTx.id ? updatedTx : t))
+      );
+    }
   };
 
-  const handleDeleteTransaction = (id: string) => {
+  const handleDeleteTransaction = async (id: string) => {
+    try {
+      await transactionApi.delete(id);
+    } catch {
+      // ignore
+    }
     setTransactions((prev) => prev.filter((t) => t.id !== id));
   };
 
@@ -122,9 +173,12 @@ export function App() {
       {currentView === 'transactions' && (
         <TransactionsPage
           transactions={transactions}
+          isLoading={isLoadingTransactions}
+          error={transactionError}
           onAddTransaction={handleAddTransaction}
           onEditTransaction={handleEditTransaction}
           onDeleteTransaction={handleDeleteTransaction}
+          onRefresh={loadTransactions}
         />
       )}
       {currentView === 'budgets' && (

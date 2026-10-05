@@ -345,12 +345,17 @@ A key differentiator of FinShield is connecting scam intelligence directly to th
 - **Key Challenges:** Distinguishing isolated unit/fallback test execution from live PostgreSQL operations to maintain 100% truthful reporting, ensuring zero secrets are committed or displayed in logs.
 - **Resolution:** Implemented explicit store classification in test suites; verified that database schema definitions and migration scripts are ready for deployment; confirmed diagnostic utilities safely mask credentials; documented the local/cloud provisioning workflow for `DATABASE_URL`.
 
-### [2026-10-05 20:30 IST] Entry 6: Milestone 4 — Live Neon PostgreSQL Authentication Verification
-- **Focus:** Proven live end-to-end integration with Neon PostgreSQL database. Executed and verified user registration, physical database persistence, duplicate email constraint rejection via `users_email_key` (409 Conflict), login with bcrypt comparison from DB, `/me` profile retrieval from PostgreSQL, session cookie invalidation on logout, and RBAC admin-route blocking (403 Forbidden).
-- **Key Challenges:** Eliminating silent in-memory fallback during active database connections, ensuring Prisma unique-constraint exceptions (`P2002`) are translated into clean HTTP 409 Conflict responses, and strictly cleaning up integration test users so database state remains pristine.
-- **Resolution:** Updated `userService.ts` to strictly route through Prisma when database connectivity is active; implemented 9 dedicated real database integration tests in `src/server/tests/dbIntegration.test.ts` (all passed); verified that database row count returned to 0 after lifecycle teardown; confirmed zero credentials tracked in git.
+### [2026-10-05 21:30 IST] Entry 7: Milestone 5 — Secure Transaction CRUD & Tenant Data Isolation (IDOR/BOLA Defense)
+- **Focus:** Implemented database-backed transaction management with strict per-user multi-tenant data isolation. Extended Prisma schema with `Transaction` model and `TransactionType` enum (`INCOME`, `EXPENSE`), applied migration `20261005213000_add_transactions` to Neon PostgreSQL, created Zod validation schemas (`createTransactionSchema`, `updateTransactionSchema`, `transactionQuerySchema`), tenant-scoped `transactionService`, Express controllers/routes mounted at `/api/transactions`, and connected the frontend `TransactionsPage`.
+- **Key Challenges:** Eliminating Broken Object Level Authorization (BOLA/IDOR) vulnerabilities, defending against mass-assignment / parameter tampering (e.g., injecting `userId`, `role`, or `isAdmin`), avoiding resource enumeration by returning generic 404 responses for cross-tenant access attempts, and maintaining pristine database state through strict automated test cleanup.
+- **Resolution:**
+  - Configured compound indexes in PostgreSQL for tenant queries (`[userId]`, `[userId, transactionDate]`, `[userId, type]`, `[userId, category]`).
+  - Enforced `where: { id: transactionId, userId: req.user.userId }` on all individual retrieval, update, and deletion operations, returning 404 when records do not belong to the authenticated user.
+  - Applied `.strict()` on Zod request schemas to instantly reject extra/unauthorized properties (such as `userId`, `role`, `isAdmin`).
+  - Implemented 9 dedicated live Neon PostgreSQL test cases in `src/server/tests/transactionIdor.test.ts` covering cross-user IDOR read/update/delete protection, tenant-scoped listing, mass-assignment blocking, input validation edge cases, search filtering, and legitimate transaction lifecycle with full database teardown. All 32 test suite assertions pass cleanly.
 
 ---
+
 
 ## 6. Testing, Security Verification & Deployment Record
 

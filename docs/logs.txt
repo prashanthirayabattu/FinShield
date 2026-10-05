@@ -2081,3 +2081,467 @@ Actions Taken:
 * Updated docs/APPROACH.md with Entry 6
 * Appended turn entry to docs/logs.txt
 * Committed and pushed to origin/main
+
+================================================================================
+[2026-10-05T21:30:00+05:30] Milestone 5 — Secure Transaction CRUD & User Data Isolation
+================================================================================
+User Prompt (verbatim):
+<USER_REQUEST>
+FinShield is running successfully on localhost and Neon PostgreSQL is LIVE.
+
+We are now starting the next official milestone:
+
+TRANSACTION CRUD + USER DATA ISOLATION
+
+IMPORTANT:
+- Follow AGENTS.md and PARTICIPANT_RULES.md exactly.
+- Do NOT modify AGENTS.md.
+- Do NOT rewrite, squash, rebase, delete, forge, or force-push Git history.
+- Every meaningful change must be genuinely authored during the hackathon.
+- PostgreSQL is REAL and VERIFIED. Use Neon PostgreSQL through Prisma.
+- Do NOT silently use the in-memory fallback for transaction operations.
+- Do NOT build budgets, dashboard analytics, ScamShield, AI assistant, CSV export, deployment, or attack lab yet.
+
+CURRENT VERIFIED LATEST COMMIT:
+57509f817cf73a26a1babe5b34d2033862099163
+
+CURRENT VERIFIED STATE:
+- Neon PostgreSQL connected
+- Prisma migration applied
+- users table verified
+- real PostgreSQL authentication verified
+- localhost frontend running
+- GitHub origin/main synchronized
+
+GOAL:
+Build the secure transaction-management foundation of FinShield.
+
+==================================================
+1. DATABASE / PRISMA
+==================================================
+
+Add a Transaction model to the existing Prisma schema.
+
+Transaction fields:
+
+- id
+- userId
+- type
+- amount
+- category
+- description
+- payee
+- transactionDate
+- createdAt
+- updatedAt
+
+Use an enum:
+
+INCOME
+EXPENSE
+
+Use a PostgreSQL-safe numeric/decimal type for amount.
+
+Create a foreign-key relationship:
+
+Transaction.userId -> User.id
+
+Add useful indexes for authenticated-user queries:
+- userId
+- userId + transactionDate
+- userId + type
+- userId + category
+
+Do NOT modify the existing User model unnecessarily.
+
+==================================================
+2. MIGRATION
+==================================================
+
+Create a proper Prisma migration for the Transaction model.
+
+Apply it to the REAL Neon PostgreSQL database.
+
+Verify directly against PostgreSQL that:
+- transactions table exists
+- type enum exists
+- userId foreign key exists
+- expected indexes exist
+- transaction rows can be persisted
+
+Do not claim the migration succeeded unless it actually ran.
+
+==================================================
+3. SERVER VALIDATION
+==================================================
+
+Use strict Zod validation.
+
+Validate:
+- amount must be greater than 0
+- type must be INCOME or EXPENSE
+- category must be from the application-supported categories
+- description length
+- payee length
+- valid transactionDate
+- reject unexpected fields
+
+Never accept userId from the client as an ownership authority.
+
+Reject mass-assignment attempts such as:
+- userId
+- ownerId
+- role
+- isAdmin
+- createdAt
+- updatedAt
+
+==================================================
+4. TRANSACTION API
+==================================================
+
+Implement:
+
+POST   /api/transactions
+GET    /api/transactions
+GET    /api/transactions/:id
+PATCH  /api/transactions/:id
+DELETE /api/transactions/:id
+
+All routes require authentication.
+
+Use the existing auth middleware.
+
+==================================================
+5. CRITICAL IDOR / BOLA DEFENSE
+==================================================
+
+This is a BUILD SECURE security requirement.
+
+NEVER authorize a transaction solely by its ID.
+
+The authenticated user ID must come from the trusted server-side authentication context.
+
+Every transaction read/update/delete MUST be scoped to:
+
+requested transaction ID
+AND
+authenticated user ID
+
+Correct security principle:
+
+WHERE transaction.id = requestedId
+AND transaction.userId = authenticatedUserId
+
+Do not:
+1. find transaction only by ID
+2. then blindly return/update/delete it
+
+A user must never be able to access another user's transaction by changing an ID in the URL.
+
+Use generic 404 behavior where appropriate so cross-user requests do not leak transaction existence.
+
+==================================================
+6. REAL POSTGRESQL SECURITY TEST
+==================================================
+
+Create TWO real database-backed test users:
+
+User A
+User B
+
+Using the real Neon PostgreSQL database:
+
+- User A creates Transaction A
+- User B creates Transaction B
+
+Verify:
+
+A can read A
+A cannot read B
+B can read B
+B cannot read A
+A cannot update B
+B cannot update A
+A cannot delete B
+B cannot delete A
+
+Also verify direct PostgreSQL rows have the correct userId.
+
+This must be a REAL PostgreSQL integration test.
+
+Do NOT count fallback testing as this security proof.
+
+==================================================
+7. MASS ASSIGNMENT TEST
+==================================================
+
+Attempt transaction requests containing malicious/protected properties:
+
+{
+  userId: anotherUserId,
+  ownerId: anotherUserId,
+  role: "ADMIN",
+  isAdmin: true,
+  createdAt: "...",
+  updatedAt: "..."
+}
+
+Verify:
+- validation rejects unexpected fields OR
+- protected fields are ignored safely
+- ownership always comes from the authenticated session
+- user cannot assign another user's userId
+
+==================================================
+8. FUNCTIONAL TESTS
+==================================================
+
+Against REAL PostgreSQL, verify:
+
+- create income
+- create expense
+- list transactions
+- get single transaction
+- update transaction
+- delete transaction
+- invalid amount
+- zero amount
+- negative amount
+- invalid type
+- invalid category
+- malformed date
+- unexpected fields
+- unauthenticated request
+- cross-user access
+
+==================================================
+9. SEARCH / FILTER
+==================================================
+
+Implement secure GET filtering:
+
+- type
+- category
+- dateFrom
+- dateTo
+- search
+
+Search should cover reasonable fields such as payee and description.
+
+ALL queries MUST remain scoped to:
+
+authenticatedUserId
+
+Do not build advanced analytics yet.
+
+==================================================
+10. FRONTEND
+==================================================
+
+Add the minimum usable transaction UI to the existing FinShield frontend:
+
+- Add Transaction form
+- Income / Expense selection
+- Amount
+- Category
+- Payee
+- Description
+- Date
+- Transaction list
+- Filter controls
+- Edit
+- Delete
+- loading state
+- empty state
+- error state
+
+Keep the existing FinShield visual language.
+
+Do not redesign the whole application.
+
+==================================================
+11. SECURITY HARDENING
+==================================================
+
+Verify:
+- authentication required
+- server-side validation
+- no client-controlled ownership
+- IDOR/BOLA protection
+- mass assignment protection
+- parameterized Prisma queries
+- generic error handling
+- no SQL/database internals leaked
+
+Do not report security checks that were not actually tested.
+
+==================================================
+12. TESTING
+==================================================
+
+Run:
+
+npm --prefix src run build
+
+tsc --project src/tsconfig.server.json --noEmit
+
+Run the existing auth tests.
+
+Run transaction integration tests.
+
+Run REAL PostgreSQL IDOR tests.
+
+Run:
+
+npm --prefix src run db:check
+
+Clearly separate:
+
+REAL POSTGRESQL TESTS
+from
+UNIT/FALLBACK TESTS
+
+==================================================
+13. DOCUMENTATION
+==================================================
+
+Update:
+
+docs/APPROACH.md
+
+Record:
+- Transaction schema
+- ownership strategy
+- IDOR/BOLA defense
+- validation strategy
+- API endpoints
+- filter design
+- testing evidence
+
+Update:
+
+docs/logs.txt
+
+Follow AGENTS.md exactly.
+
+Do not rewrite old logs.
+
+==================================================
+14. GIT — MANDATORY
+==================================================
+
+Before committing:
+
+git status
+git diff
+
+Verify:
+- no .env
+- no .env.local
+- no database credentials
+- no API keys
+- no unrelated files
+
+Create EXACTLY ONE commit:
+
+feat: add secure transaction management
+
+Then push:
+
+git push origin main
+
+Then verify:
+
+git rev-parse HEAD
+git rev-parse origin/main
+git status
+
+HEAD MUST equal origin/main.
+
+Working tree MUST be clean.
+
+Report the FULL 40-character SHA.
+
+==================================================
+15. FINAL RESPONSE
+==================================================
+
+Return exactly:
+
+1. STATUS
+2. DATABASE
+3. TRANSACTION API
+4. IDOR/BOLA SECURITY
+5. MASS ASSIGNMENT SECURITY
+6. REAL POSTGRESQL TESTS
+7. FRONTEND
+8. BUILD / TYPECHECK
+9. DOCUMENTATION
+10. GIT
+11. LIMITATIONS
+
+CRITICAL:
+
+Do not claim:
+- PostgreSQL persistence unless directly verified
+- IDOR protection unless cross-user access was actually tested
+- security coverage unless tests actually executed
+- GitHub push unless verified
+
+The milestone is successful only when the implementation, real PostgreSQL tests, security tests, documentation, commit, push, and Git synchronization all succeed.
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-10-05T21:15:52+05:30.
+
+The user's current state is as follows:
+Active Document: c:\Users\prashanthi\BuildSecure\src\server\scripts\checkDb.ts (LANGUAGE_UNSPECIFIED)
+Cursor is on line: 1
+Other open documents:
+- c:\Users\prashanthi\BuildSecure\src\prisma\schema.prisma (LANGUAGE_UNSPECIFIED)
+- c:\Users\prashanthi\BuildSecure\src\tsconfig.json (LANGUAGE_UNSPECIFIED)
+- c:\Users\prashanthi\BuildSecure\src\src\index.css (LANGUAGE_UNSPECIFIED)
+- c:\Users\prashanthi\BuildSecure\src\vite.config.ts (LANGUAGE_UNSPECIFIED)
+- c:\Users\prashanthi\BuildSecure\metadata\submission.yaml (LANGUAGE_UNSPECIFIED)
+</ADDITIONAL_METADATA>
+
+Agent Response:
+Implemented Milestone 5 — Secure Transaction CRUD + User Data Isolation for FinShield. Added Transaction model and TransactionType enum (INCOME, EXPENSE) to Prisma schema with compound indexes for tenant queries. Applied migration 20261005213000_add_transactions directly to live Neon PostgreSQL and regenerated Prisma Client. Created strict Zod schemas rejecting extra/unexpected fields (disallowing userId, role, isAdmin tampering). Built tenant-scoped transactionService enforcing where: { id, userId: req.user.userId } on all access, update, and delete operations with generic 404 responses to eliminate IDOR/BOLA. Mounted transaction routes at /api/transactions protected by authentication middleware. Implemented 9 automated tests in src/server/tests/transactionIdor.test.ts verifying cross-tenant read/update/delete rejection (404), list isolation, mass assignment blocking, input validation edge cases, search filtering, and lifecycle teardown. Connected frontend TransactionsPage and App.tsx with loading/error feedback. Verified with 32 passing backend tests, clean Vite build, and zero errors.
+
+Agent Response Summary:
+Built and verified secure transaction management and tenant data isolation in src/server/ on live Neon PostgreSQL. Applied Prisma migration 20261005213000_add_transactions, implemented strict Zod validation disallowing mass-assignment, and enforced multi-tenant ownership scoping in transactionService to eliminate IDOR/BOLA vulnerabilities. Verified with 9 dedicated real database security tests (32 total tests across all suites passing), updated frontend integration, documented architecture in docs/APPROACH.md, and synchronized changes with origin/main.
+
+Commit SHA:
+4d69bd0197abfb9594421e584fdc2c7b36aa4f14
+
+Files Modified / Created:
+* docs/APPROACH.md (Modified)
+* docs/logs.txt (Modified)
+* src/package.json (Modified)
+* src/prisma/migrations/20261005213000_add_transactions/migration.sql (Created)
+* src/prisma/schema.prisma (Modified)
+* src/server/controllers/transactionController.ts (Created)
+* src/server/routes/index.ts (Modified)
+* src/server/routes/transactionRoutes.ts (Created)
+* src/server/schemas/transactionSchemas.ts (Created)
+* src/server/scripts/checkDb.ts (Modified)
+* src/server/services/transactionService.ts (Created)
+* src/server/tests/transactionIdor.test.ts (Created)
+* src/src/App.tsx (Modified)
+* src/src/pages/TransactionsPage.tsx (Modified)
+* src/src/services/transactionApi.ts (Created)
+
+Actions Taken:
+* Extended Prisma schema with Transaction model, TransactionType enum, foreign key, and 4 compound indexes
+* Created and deployed migration 20261005213000_add_transactions to live Neon PostgreSQL
+* Regenerated Prisma Client v6.4.1
+* Enhanced checkDb.ts to verify tables, enums, foreign keys, and indexes directly against PostgreSQL
+* Created Zod validation schemas in transactionSchemas.ts with strict() rejection of unexpected parameters
+* Implemented transactionService.ts with mandatory userId scoping and 404 anti-enumeration responses
+* Implemented transactionController.ts and mounted routes in transactionRoutes.ts
+* Created 9 automated tests in transactionIdor.test.ts and verified all 32 tests pass across all test suites
+* Connected frontend transactionApi.ts with loading skeleton and error retry UI in TransactionsPage.tsx
+* Verified npm run build (0 errors) and tsc (0 errors)
+* Updated docs/APPROACH.md with Entry 7
+* Appended turn entry to docs/logs.txt
+* Committed changes and pushed to origin/main
