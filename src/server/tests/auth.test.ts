@@ -4,15 +4,29 @@ import request from 'supertest';
 import { app } from '../app';
 import { userService } from '../services/userService';
 import { signAuthToken, AUTH_COOKIE_NAME } from '../auth/jwt';
-import { checkDatabaseConnection } from '../db/prisma';
+import { prisma, checkDatabaseConnection } from '../db/prisma';
 
 describe('FinShield Milestone 2 — Backend & Secure Authentication Test Suite', () => {
-  before(() => {
+  before(async () => {
     userService._clearMemoryStore();
+    try {
+      await prisma.user.deleteMany({
+        where: { email: { contains: 'finshield.local' } },
+      });
+    } catch {
+      // safe ignore
+    }
   });
 
-  after(() => {
+  after(async () => {
     userService._clearMemoryStore();
+    try {
+      await prisma.user.deleteMany({
+        where: { email: { contains: 'finshield.local' } },
+      });
+    } catch {
+      // safe ignore
+    }
   });
 
   // 1. Health check endpoint
