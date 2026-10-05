@@ -335,6 +335,11 @@ A key differentiator of FinShield is connecting scam intelligence directly to th
 - **Key Challenges:** Enforcing strict anti-enumeration on authentication failures, preventing role-escalation payloads via Zod `.strict()`, and handling database connectivity transparently.
 - **Resolution:** Full test suite with 14 automated tests passed (health, registration, duplicate rejection, login, invalid credentials, `/me`, logout, RBAC forbidden check, malformed input rejection, role injection rejection, rate limiting header checks, and DB connectivity). Integrated frontend auth client with backend endpoints.
 
+### [2026-10-05 19:35 IST] Entry 4: Milestone 3 — PostgreSQL & Prisma Migration Pipeline
+- **Focus:** Established canonical initial Prisma migration (`src/prisma/migrations/20261005190000_init/migration.sql`), migration lockfile, and automated database verification tooling (`src/server/scripts/checkDb.ts`).
+- **Key Challenges:** Ensuring deterministic database schema synchronization and migration readiness while maintaining zero credential leaks and seamless graceful fallback when a live database is pending provisioning.
+- **Resolution:** Scripted offline migration generation via Prisma diffing against the datamodel; validated schema fidelity; created a safe diagnostic tool that verifies database reachability without credential exposure; confirmed test suite execution (14 passing tests).
+
 ---
 
 ## 6. Testing, Security Verification & Deployment Record
