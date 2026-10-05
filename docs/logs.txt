@@ -3460,3 +3460,126 @@ Actions Taken:
 * Verified tsc on server (0 errors)
 * Updated docs/logs.txt
 * Created single commit 'fix: clarify AI data access wording' and pushed to origin/main
+
+================================================================================
+[2026-10-06T04:45:00+05:30] Fix Authenticated AI Session Cookie Transport Flow
+================================================================================
+User Prompt (verbatim):
+FINSHIELD — AI AUTHENTICATION SESSION BUG
+
+The AI Assistant frontend is reaching the backend, but the browser receives:
+
+"Authentication required: missing or empty authorization token"
+
+Important:
+- Do NOT change the AI security architecture.
+- Do NOT remove authentication.
+- Do NOT disable auth middleware.
+- Do NOT expose JWT/session tokens.
+- Do NOT modify AGENTS.md.
+- Follow AGENTS.md and PARTICIPANT_RULES.md.
+- Preserve Git history.
+
+Current environment:
+Frontend: http://localhost:5174
+Backend: http://localhost:5000
+AI endpoint: POST /api/ai/assistant
+
+Previously verified:
+- AI endpoint exists
+- authenticate middleware protects it
+- credentials: 'include' is used by src/src/services/aiApi.ts
+- Vite /api proxy was added
+- AI backend security tests pass
+
+TASK:
+
+1. Reproduce the authentication failure from the browser.
+2. Inspect the browser Network tab for:
+   POST /api/auth/login
+   GET /api/auth/me
+   POST /api/ai/assistant
+
+3. Verify whether the authentication cookie is:
+   - set correctly by /login
+   - sent correctly with /me
+   - sent correctly with /ai/assistant
+
+4. Identify why the cookie is missing or rejected:
+   - Is it cross-origin between port 5174 and 5000?
+   - Is Vite proxy forwarding cookies?
+   - Is cookie SameSite / Secure / HttpOnly configured correctly for localhost?
+   - Is path set correctly?
+   - Is the frontend client using relative URLs (/api) or absolute URLs (http://localhost:5000)?
+   - Are different services using inconsistent base URLs?
+
+5. Fix the cookie / session transport so the browser keeps the authenticated session for the AI Assistant.
+
+6. Verify end-to-end:
+   - User logs in from http://localhost:5174
+   - Cookie is stored
+   - /me succeeds
+   - AI query:
+     "How much did I spend this month?"
+     succeeds with HTTP 200
+   - Response uses real PostgreSQL financial data
+   - Prompt injection is blocked
+   - Unauthenticated request is rejected with 401
+
+Do not remove auth.
+Do not bypass auth.
+Do not hard-code auth tokens.
+Keep credentials: 'include'.
+
+Run:
+npm --prefix src run test
+npm --prefix src run build
+npm --prefix src run lint
+tsc --project src/tsconfig.server.json --noEmit
+npm --prefix src run db:check
+
+Update docs/logs.txt according to AGENTS.md.
+
+Inspect git status and git diff.
+
+Create exactly ONE commit:
+fix: restore authenticated AI session flow
+
+Push to origin/main.
+
+Verify:
+git rev-parse HEAD
+git rev-parse origin/main
+git status
+
+Report the FULL 40-character SHA.
+
+Agent Response:
+Diagnosed and resolved the root cause of the AI Assistant authentication failure when the Vite development server runs on http://localhost:5174 while Express runs on http://localhost:5000. Identified two core issues: First, Express CORS in src/server/app.ts was restricted to a single origin (env.FRONTEND_URL default http://localhost:5173); when Vite automatically bound to port 5174 due to port 5173 being active, CORS headers failed or rejected requests originating from port 5174, causing browsers to drop or reject the Set-Cookie credential header. Second, while aiApi.ts, budgetApi.ts, dashboardApi.ts, scamApi.ts, and exportApi.ts called relative URLs (/api/*) through the Vite reverse proxy, authApi.ts and transactionApi.ts had hardcoded default fallbacks to http://localhost:5000/api. This caused login and auth calls to hit port 5000 directly cross-origin while the AI assistant called relative /api/ai/assistant through the Vite proxy on port 5174, creating an origin mismatch where cookies set on http://localhost:5000 were not attached to the Vite reverse proxy session on port 5174. Resolved by: (1) configuring Express CORS origin whitelist supporting env.FRONTEND_URL, http://localhost:5173, http://localhost:5174, http://127.0.0.1:5173, and http://127.0.0.1:5174; and (2) updating authApi.ts and transactionApi.ts API_BASE fallbacks to '/api' so all frontend services uniformly use the same origin reverse proxy. Confirmed full end-to-end flow through http://localhost:5174: user registration and login sets finshield_auth_token HttpOnly cookie (Max-Age=7200, Path=/, SameSite=Lax), GET /api/auth/me succeeds with 200, POST /api/ai/assistant succeeds with 200 using live Neon PostgreSQL calculations, prompt injection is blocked with a safety refusal, and unauthenticated requests return 401. All 83 automated regression tests pass, Vite build succeeds cleanly, ESLint passes with 0 errors, server TypeScript compiles with 0 errors, and Neon database rows remain at 0.
+
+Agent Response Summary:
+Eliminated cookie isolation and cross-origin authentication failures when running on port 5174 by harmonizing frontend API base URLs to '/api' across authApi.ts and transactionApi.ts and expanding Express CORS allowedOrigins to include ports 5173 and 5174. Verified full end-to-end authenticated AI queries with live Neon PostgreSQL data, prompt injection defenses, and all 83 automated test assertions across 7 test suites.
+
+Commit SHA:
+PENDING_GIT_COMMIT
+
+Files Modified / Created:
+* docs/logs.txt (Modified)
+* src/server/app.ts (Modified)
+* src/src/services/authApi.ts (Modified)
+* src/src/services/transactionApi.ts (Modified)
+
+Actions Taken:
+* Investigated browser Network and cookie flow between port 5174 and backend port 5000
+* Identified CORS origin restriction and inconsistent API_BASE between authApi.ts/transactionApi.ts (http://localhost:5000/api) and other services (/api)
+* Updated src/server/app.ts CORS origin to accept array of development origins (5173, 5174, 127.0.0.1:5173, 127.0.0.1:5174, and FRONTEND_URL)
+* Updated src/src/services/authApi.ts and src/src/services/transactionApi.ts to default API_BASE to '/api'
+* Tested end-to-end authentication, cookie retention, /me profile verification, and AI assistant query on http://localhost:5174
+* Verified live Neon PostgreSQL financial calculation in AI response and verified prompt injection defense
+* Verified unauthenticated request returns 401 Unauthorized
+* Executed complete test suite (83 tests pass across 7 suites with 0 failures)
+* Verified npm run db:check (0 residual rows across all tables)
+* Verified npm run build (clean production build)
+* Verified npm run lint (0 lint warnings or errors)
+* Verified server TypeScript compilation (0 errors)
+* Committed changes with message 'fix: restore authenticated AI session flow' and pushed to origin/main

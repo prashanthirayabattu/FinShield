@@ -1,6 +1,6 @@
 import type { UserProfile } from '../types';
 
-const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) || 'http://localhost:5000/api';
+const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) || '/api';
 
 export interface RegisterPayload {
   name: string;
