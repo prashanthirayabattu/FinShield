@@ -30,7 +30,7 @@ export const AIAssistantPage: React.FC = () => {
     {
       id: 'msg_01',
       sender: 'assistant',
-      text: 'Hello! I am your FinShield Secure AI Financial Advisor. I have direct, real-time read access to your authenticated Neon PostgreSQL financial ledger. You can ask me about your spending, specific categories, budget limits, or recent transactions.',
+      text: 'Hello! I am your FinShield Secure AI Financial Advisor. I analyze your securely scoped financial data to answer questions about your spending, budgets, and savings. You can ask me about your expenses, specific categories, budget limits, or recent transactions.',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
@@ -212,7 +212,7 @@ export const AIAssistantPage: React.FC = () => {
               </div>
               <div className="bg-slate-900/90 text-slate-300 border border-slate-800 rounded-2xl rounded-tl-none p-4 text-xs flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                <span>Consulting your PostgreSQL financial ledger...</span>
+                <span>Analyzing your securely scoped financial data...</span>
               </div>
             </div>
           )}
@@ -250,7 +250,7 @@ export const AIAssistantPage: React.FC = () => {
           <div className="mt-2 text-center text-[11px] text-slate-500 flex items-center justify-center gap-1.5">
             <ShieldCheck className="w-3.5 h-3.5 text-teal-400" />
             <span>
-              Directly queries your authenticated PostgreSQL transactions; zero external prompt leaks.
+              Analyzes your securely scoped financial records via verified backend controls; zero credential leaks.
             </span>
           </div>
         </div>
