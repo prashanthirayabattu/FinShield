@@ -89,3 +89,163 @@ AGREEMENT RECORDED: c:\Users\prashanthi\BuildSecure
 Agent: Antigravity
 System Time: 2026-10-05T18:13:57+05:30
 Deadline: 2026-10-06T11:00:00+05:30
+
+
+================================================================================
+[2026-10-05T18:17:06+05:30] FinShield Architecture & Threat Modeling Specification
+================================================================================
+User Prompt (verbatim):
+Now proceed to the architecture/documentation phase for our project.
+
+PROJECT:
+FinShield — Secure Personal Finance & AI Assistant
+
+TEAM:
+Tech Tribe
+Team ID: 50
+4 members
+
+The project must satisfy PS-01:
+- User registration, login and profile management
+- User/Admin roles with RBAC
+- Income and expense management
+- Expense categories
+- Budget creation and tracking
+- Transaction history, search and filtering
+- Financial dashboard and summaries
+- Personal financial data export
+- Optional AI financial assistant
+
+Our differentiator:
+ScamShield is integrated into FinShield as a financial fraud-protection layer.
+
+ScamShield should support:
+- Suspicious message analysis
+- URL analysis
+- UPI ID analysis
+- Risk scoring: LOW / MEDIUM / HIGH
+- Explainable risk reasons
+- Scam-to-ledger transaction matching
+- Suspicious transaction alerts
+
+SECURITY IS A CORE REQUIREMENT.
+
+We need to address the BUILD SECURE focus areas:
+- API & Web Security
+- Authentication
+- Authorization / RBAC
+- SQL Injection
+- XSS
+- Secure File Handling
+- Post-Deployment Analysis
+
+TARGET ARCHITECTURE:
+
+Frontend:
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+
+Backend:
+- Node.js
+- Express.js
+
+Database:
+- PostgreSQL
+- Prisma ORM
+
+Authentication:
+- bcrypt
+- JWT or secure session approach
+- RBAC
+
+Validation and security:
+- Zod
+- Helmet
+- CORS
+- Rate limiting
+- Server-side validation
+- Parameterized/ORM queries
+- Secure file handling
+- Secure CSV export
+- Security headers
+- Generic production errors
+
+AI:
+- OpenAI or Gemini through a server-side API integration
+- AI must receive only the authenticated user's authorized financial context
+- Never expose provider API keys in frontend code
+
+Deployment target:
+- Vercel for frontend
+- Render or Railway for backend
+- Managed PostgreSQL
+
+DOCUMENTATION TASK:
+
+Update docs/APPROACH.md only.
+
+Do NOT modify:
+- AGENTS.md
+- application code in src/
+- metadata unless strictly required for this architecture entry
+- deployment files
+
+Populate the architecture document with:
+
+1. Problem Understanding & Scope
+2. Target Users
+3. Critical Assets
+4. Threat Model
+5. Attack Surface
+6. OWASP-relevant risks
+7. High-level architecture
+8. Data flow and trust boundaries
+9. Technology stack and rationale
+10. Authentication architecture
+11. Authorization / RBAC
+12. Input validation
+13. SQL injection prevention
+14. XSS prevention
+15. Secure file handling
+16. Rate limiting
+17. Secrets management
+18. AI security
+19. Security logging / audit events
+20. ScamShield architecture
+21. Scam-to-ledger linking
+22. 24-hour implementation milestones
+23. Architecture Decision Records for the major technology choices
+24. Testing and deployment strategy
+
+IMPORTANT:
+- Do not claim a control is already implemented. Clearly distinguish planned controls from implemented controls.
+- Do not invent external APIs that we have not selected.
+- Keep the architecture realistic for a 24-hour hackathon.
+- All reasoning should support the actual FinShield product rather than a generic security application.
+
+After updating docs/APPROACH.md:
+1. Run a quick markdown/content validation.
+2. Show me the key architectural decisions you recorded.
+3. List the exact files modified.
+4. Stop. Do not modify src/ yet.
+
+Agent Response:
+Updated docs/APPROACH.md comprehensively to specify the full architecture of FinShield — Secure Personal Finance & AI Assistant with integrated ScamShield fraud protection. Detailed problem understanding, STRIDE threat model, attack surface, OWASP Top 10 risks, 3-tier architecture, data flow across 4 trust boundaries, authentication/authorization specifications, input validation, SQLi/XSS/CSV injection defenses, rate limiting, secrets management, server-side AI proxy, security audit logging, ScamShield heuristic engine, scam-to-ledger matching, 24-hour milestones, and 7 Architecture Decision Records (ADRs). Performed markdown validation, confirmed zero modifications to src/ or AGENTS.md, and provided summary of key architectural decisions.
+
+Agent Response Summary:
+Fully specified docs/APPROACH.md addressing all 24 required technical and security areas for FinShield and ScamShield. Clearly demarcated planned vs implemented controls, documented 7 ADRs, and established defense-in-depth controls while leaving src/ untouched for subsequent implementation phases.
+
+Commit SHA:
+12db94f
+
+Files Modified / Created:
+* docs/APPROACH.md (Modified)
+* docs/logs.txt (Modified)
+
+Actions Taken:
+* Rewrote docs/APPROACH.md with comprehensive FinShield architecture, threat model, security controls, and ADRs
+* Validated markdown and content size
+* Appended turn entry to docs/logs.txt
+* Committed changes to git
