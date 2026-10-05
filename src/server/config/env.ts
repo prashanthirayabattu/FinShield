@@ -34,6 +34,9 @@ export interface ServerEnv {
   IS_REAL_DATABASE_CONFIGURED: boolean;
   JWT_SECRET: string;
   FRONTEND_URL: string;
+  AI_PROVIDER?: string;
+  GEMINI_API_KEY?: string;
+  OPENAI_API_KEY?: string;
 }
 
 const isRealDbConfigured = Boolean(process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== '');
@@ -52,6 +55,9 @@ const getEnv = (): ServerEnv => {
     IS_REAL_DATABASE_CONFIGURED: isRealDbConfigured,
     JWT_SECRET: process.env.JWT_SECRET || 'finshield_secure_dev_jwt_secret_min32chars_test',
     FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:5173',
+    AI_PROVIDER: process.env.AI_PROVIDER || (process.env.GEMINI_API_KEY ? 'gemini' : process.env.OPENAI_API_KEY ? 'openai' : undefined),
+    GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   };
 };
 

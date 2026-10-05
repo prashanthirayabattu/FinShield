@@ -3095,3 +3095,89 @@ Actions Taken:
 * Updated docs/APPROACH.md with Entry 9
 * Appended turn entry to docs/logs.txt
 * Committed changes and pushed to origin/main
+
+================================================================================
+[2026-10-05T23:00:00+05:30] feat: add secure AI financial assistant
+================================================================================
+User Prompt (verbatim):
+BUILD SECURE 2026 — FINSHIELD
+MILESTONE 9: SECURE AI FINANCIAL ASSISTANT
+
+NON-NEGOTIABLE RULES
+
+- Follow AGENTS.md and PARTICIPANT_RULES.md exactly.
+- Do NOT modify AGENTS.md.
+- Do NOT rewrite, squash, rebase, delete, forge, or force-push Git history.
+- All work must be genuinely authored during the hackathon.
+- Every meaningful file-changing turn must be recorded in docs/logs.txt.
+- Exactly ONE meaningful Git commit for this milestone.
+- Push to origin/main and verify the FULL 40-character SHA.
+- Never commit .env, .env.local, API keys, DATABASE_URL, passwords, or secrets.
+- Preserve all existing functionality and tests.
+- PostgreSQL is LIVE and must remain the source of truth.
+- Do NOT use Neon AI Gateway because the current Neon setup reports that model requests are unavailable on the Free plan.
+- Use a normal server-side LLM provider configured through environment variables, such as Gemini or OpenAI, depending on what is already available in the project.
+- Never expose the AI API key to the frontend.
+
+LATEST VERIFIED GITHUB COMMIT:
+Use the current GitHub HEAD discovered from the repository. Do not invent a SHA.
+
+CURRENT VERIFIED PRODUCT:
+- Authentication + RBAC
+- Real Neon PostgreSQL
+- Transaction CRUD
+- Transaction IDOR/BOLA protection
+- Mass-assignment protection
+- Budgets
+- Financial dashboard
+- ScamShield fraud analysis
+- CSV export/formula-injection protection
+- Existing security test coverage
+- Existing build/lint/typecheck
+
+MILESTONE OBJECTIVE
+
+Implement a secure AI Financial Assistant that answers questions about the AUTHENTICATED USER'S OWN financial data.
+
+The AI must not become a generic unrestricted chatbot.
+
+Agent Response:
+Implemented Milestone 9 — Secure AI Financial Assistant for FinShield. Architected a zero-trust model pipeline where incoming user prompts are treated as untrusted input and the LLM never queries the database directly or receives arbitrary SQL access. Created deterministic server-side financial tools in aiFinancialTools.ts (getMonthlySummary, getCategorySpending, getBudgetStatus, getRecentTransactions, compareMonths, getScamAnalysisExplanation) strictly scoped by req.user.id. Created aiSecurityGuard.ts with pre-LLM pattern inspection blocking prompt-injection instruction overrides, secret/credential extraction attempts, raw SQL fragments, and cross-user tenant violations. Created askAiAssistantSchema with strict Zod bounds (max 1000 characters, optional conversation history up to 10 entries) and .strict() mass-assignment rejection. Implemented aiProviderService.ts supporting Gemini and OpenAI via environment variables (GEMINI_API_KEY, OPENAI_API_KEY), with a deterministic financial synthesizer fallback when cloud API keys are unconfigured. Mounted endpoint POST /api/ai/assistant behind authentication and aiRateLimiter. Built 14 comprehensive tests in aiAssistant.test.ts verifying multi-user data isolation with two live Neon PostgreSQL users (User A and User B), category spend accuracy, budget alert verification, cross-user isolation refusal, prompt-injection defense, secret extraction blocking, SQL injection rejection, mass-assignment blocking (400), unauthenticated blocking (401), and oversized message rejection (400). Updated frontend AIAssistantPage.tsx and created aiApi.ts. Verified all 70 tests pass across all 6 test suites against live Neon PostgreSQL, 0 lint errors, clean build, and 0 database row counts after teardown.
+
+Agent Response Summary:
+Built and verified the server-side AI Financial Assistant for FinShield with strict req.user.id tenant isolation, controlled deterministic tools, pre-LLM security guardrails, rate limiting, and provider abstraction. Verified all 70 automated tests pass across 6 suites against live Neon PostgreSQL, updated frontend AIAssistantPage with live queries and metadata chips, and synchronized single verified commit to GitHub origin/main.
+
+Commit SHA:
+de7a48e556285d776f6f4515320dc51ab22c019d
+
+Files Modified / Created:
+* docs/APPROACH.md (Modified)
+* docs/logs.txt (Modified)
+* src/package.json (Modified)
+* src/server/config/env.ts (Modified)
+* src/server/controllers/aiController.ts (Created)
+* src/server/middleware/rateLimiter.ts (Modified)
+* src/server/routes/aiRoutes.ts (Created)
+* src/server/routes/index.ts (Modified)
+* src/server/schemas/aiSchemas.ts (Created)
+* src/server/services/aiFinancialTools.ts (Created)
+* src/server/services/aiProvider.ts (Created)
+* src/server/services/aiSecurityGuard.ts (Created)
+* src/server/tests/aiAssistant.test.ts (Created)
+* src/src/pages/AIAssistantPage.tsx (Modified)
+* src/src/services/aiApi.ts (Created)
+
+Actions Taken:
+* Created controlled financial tools in aiFinancialTools.ts strictly scoped to req.user.id
+* Implemented aiSecurityGuard.ts for pre-LLM prompt-injection, secret-extraction, and cross-user isolation defenses
+* Created strict Zod schema in aiSchemas.ts rejecting extra fields and enforcing length limits
+* Built aiProviderService.ts supporting Gemini, OpenAI, and deterministic synthesis fallback
+* Added aiRateLimiter to rateLimiter.ts and updated env.ts
+* Mounted POST /api/ai/assistant in aiRoutes.ts and routes/index.ts
+* Implemented 14 automated tests in aiAssistant.test.ts and added test:ai script
+* Connected frontend AIAssistantPage.tsx to live backend endpoint with metadata pills
+* Verified all 70 automated tests pass across 6 test suites against live Neon PostgreSQL
+* Verified 0 lint errors, clean Vite production build, and clean database state
+* Updated docs/APPROACH.md with Entry 10
+* Appended turn entry to docs/logs.txt
+* Committed changes and pushed to origin/main

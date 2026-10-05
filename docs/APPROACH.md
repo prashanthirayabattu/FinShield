@@ -373,6 +373,18 @@ A key differentiator of FinShield is connecting scam intelligence directly to th
   - All 56 automated test assertions across all 5 test suites pass with zero failures against live Neon PostgreSQL. All test records cleanly torn down with database row counts verified at 0.
   - Updated frontend `ScamShieldPage.tsx` to communicate with the live backend, presenting real-time risk scores, category chips, extracted parameters, explainable indicators, protective recommendations, and ledger matching warning cards.
 
+### [2026-10-05 22:55 IST] Entry 10: Milestone 9 — Secure AI Financial Assistant & Controlled Financial Tools
+- **Focus:** Implemented the secure server-side AI Financial Assistant layer for FinShield. Designed a zero-trust model architecture where user messages are treated as untrusted input and the LLM never queries the database directly or receives arbitrary SQL permissions. Created deterministic financial tools (`getMonthlySummary`, `getCategorySpending`, `getBudgetStatus`, `getRecentTransactions`, `compareMonths`, `getScamAnalysisExplanation`) scoped strictly to `req.user.id`. Implemented pre-LLM security guard (`aiSecurityGuard.ts`) detecting prompt injections, secret extraction attempts, SQL injection text, and cross-user tenant violations. Implemented provider abstraction (`aiProviderService.ts`) supporting Gemini / OpenAI when environment API keys are configured, with deterministic financial synthesis fallback. Mounted authenticated, rate-limited endpoint `POST /api/ai/assistant`. Connected frontend `AIAssistantPage.tsx` with live query support, loading states, metadata pills, and responsive chat.
+- **Key Challenges:**
+  - Preventing prompt injection & cross-tenant data leakage: Addressed by assembling structured financial context strictly via authenticated `req.user.id` BEFORE the LLM sees the prompt. Even adversarial prompts cannot expand context outside the authenticated user's records.
+  - Zero key exposure to the client: Vendor API keys (`GEMINI_API_KEY`, `OPENAI_API_KEY`) and `DATABASE_URL` remain strictly server-side.
+  - Eliminating LLM hallucinations: Answers are synthesized strictly from structured PostgreSQL aggregates rather than speculative LLM knowledge.
+  - Mass-assignment & denial-of-service defense: Enforced `.strict()` on Zod validation schema `askAiAssistantSchema` (rejecting `userId`, `role`, `isAdmin`, `tool`, `sql`), upper bound length limits (max 1000 chars), and endpoint rate-limiting (`aiRateLimiter`).
+- **Resolution:**
+  - Implemented 14 comprehensive tests in `src/server/tests/aiAssistant.test.ts` with two distinct PostgreSQL-backed users (User A and User B). Verified that identical spending questions return only the respective user's data, cross-user inquiries are blocked with zero leakage, prompt injections and secret extractions are intercepted, and parameter tampering is rejected with 400.
+  - All 70 automated test assertions across all 6 test suites passed with zero failures against live Neon PostgreSQL. All test records cleanly torn down with database row counts verified at 0.
+  - Updated frontend `AIAssistantPage.tsx` and created `aiApi.ts`.
+
 ---
 
 
