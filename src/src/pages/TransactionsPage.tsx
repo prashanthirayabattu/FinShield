@@ -8,6 +8,7 @@ import {
   AlertTriangle,
   CheckCircle2,
   Calendar,
+  Download,
 } from 'lucide-react';
 import type { Transaction, TransactionCategory, TransactionType } from '../types';
 import { Modal } from '../components/Modal';
@@ -59,6 +60,28 @@ export const TransactionsPage: React.FC<TransactionsPageProps> = ({
   const [description, setDescription] = useState<string>('');
   const [payee, setPayee] = useState<string>('');
   const [category, setCategory] = useState<TransactionCategory>('Food');
+  const [isExporting, setIsExporting] = useState<boolean>(false);
+
+  const handleExportCsv = async () => {
+    setIsExporting(true);
+    try {
+      const res = await fetch('/api/transactions/export', { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to export CSV');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `finshield_transactions_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (e) {
+      console.error('Export failed:', e);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const openAddModal = () => {
     setEditingTransaction(null);
@@ -145,12 +168,23 @@ export const TransactionsPage: React.FC<TransactionsPageProps> = ({
             Complete record of income and expenses protected by fraud matching
           </p>
         </div>
-        <button
-          onClick={openAddModal}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-lg shadow-cyan-500/20 transition-all hover:scale-105"
-        >
-          <Plus className="w-4 h-4" /> Add Transaction
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleExportCsv}
+            disabled={isExporting}
+            className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyan-500 text-slate-200 font-semibold text-xs transition-all disabled:opacity-50"
+            title="Download CSV protected against formula injection"
+          >
+            <Download className="w-4 h-4 text-cyan-400" />
+            {isExporting ? 'Exporting...' : 'Export CSV'}
+          </button>
+          <button
+            onClick={openAddModal}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-lg shadow-cyan-500/20 transition-all hover:scale-105"
+          >
+            <Plus className="w-4 h-4" /> Add Transaction
+          </button>
+        </div>
       </div>
 
       {/* Error Alert Banner */}

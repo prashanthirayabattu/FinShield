@@ -1,4 +1,5 @@
 import { Response, NextFunction } from 'express';
+import { prisma } from '../db/prisma';
 import { transactionService } from '../services/transactionService';
 import { transactionQuerySchema } from '../schemas/transactionSchemas';
 import { AuthenticatedRequest } from '../types';
@@ -125,6 +126,34 @@ export const transactionController = {
       res.status(200).json({
         message: 'Transaction deleted successfully',
       });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * GET /api/transactions/export
+   */
+  async exportCsv(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user) {
+        res.status(401).json({ error: 'Unauthorized: missing authentication session' });
+        return;
+      }
+
+      const transactions = await prisma.transaction.findMany({
+        where: { userId: req.user.id },
+        orderBy: { transactionDate: 'desc' },
+      });
+
+      const { generateTransactionsCsv } = await import('../utils/csvExporter');
+      const csvData = generateTransactionsCsv(transactions);
+      const today = new Date().toISOString().split('T')[0];
+
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="finshield_transactions_${today}.csv"`);
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      res.status(200).send(csvData);
     } catch (err) {
       next(err);
     }

@@ -20,6 +20,8 @@ router.post(
 
 router.get('/', transactionController.list);
 
+router.get('/export', transactionController.exportCsv);
+
 router.get('/:id', transactionController.getById);
 
 router.patch(

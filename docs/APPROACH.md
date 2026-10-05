@@ -383,7 +383,19 @@ A key differentiator of FinShield is connecting scam intelligence directly to th
 - **Resolution:**
   - Implemented 14 comprehensive tests in `src/server/tests/aiAssistant.test.ts` with two distinct PostgreSQL-backed users (User A and User B). Verified that identical spending questions return only the respective user's data, cross-user inquiries are blocked with zero leakage, prompt injections and secret extractions are intercepted, and parameter tampering is rejected with 400.
   - All 70 automated test assertions across all 6 test suites passed with zero failures against live Neon PostgreSQL. All test records cleanly torn down with database row counts verified at 0.
-  - Updated frontend `AIAssistantPage.tsx` and created `aiApi.ts`.
+### [2026-10-05 23:25 IST] Entry 11: Milestone 10 — Security Hardening, Secure CSV Export & Consolidated Security Audit
+- **Focus:** Implemented production security hardening, secure CSV ledger export with CWE-1236 formula injection defense, updated the transparent Security Center, and created a consolidated 13-test security audit verification suite. 
+  - **Secure CSV Export:** Implemented `GET /api/transactions/export` in `src/server/controllers/transactionController.ts` powered by `src/server/utils/csvExporter.ts`. Formulates RFC-4180 compliant CSV streams where all user-controllable text cells starting with `=`, `+`, `-`, `@`, `\t`, or `\r` are neutralized with single-quote prefixing (`'`), completely eliminating Dynamic Data Exchange (DDE) formula injection. Served with `X-Content-Type-Options: nosniff` and scoped strictly to `req.user.id`.
+  - **Consolidated Security Audit:** Created `src/server/tests/securityAudit.test.ts` executing 13 exhaustive attack verification tests across Authentication, IDOR/BOLA, Mass Assignment, SQL Injection, Stored XSS, CSV Formula Injection, SSRF, and Prompt Injection against live Neon PostgreSQL.
+  - **Security Center UI & Export Actions:** Upgraded `SecurityPage.tsx` to reflect all 11 security controls active and verified across all 6 posture areas (100% posture) backed by 83 automated tests. Connected real authenticated CSV export downloads in `ReportsPage.tsx` and `TransactionsPage.tsx`.
+- **Key Challenges:**
+  - Defeating CSV / Spreadsheet Formula Injection (CWE-1236): Spreadsheet programs like Excel and LibreOffice interpret cells starting with `=`, `+`, `-`, or `@` as executable formula expressions. Resolved by designing `sanitizeCsvCell` in `csvExporter.ts` which sanitizes prefix characters with a single-quote escape and properly wraps cells in quotes.
+  - Verification of defense-in-depth across the entire stack: Verified that parameterized queries prevent SQLi, Zod schemas with `.strict()` reject mass assignment across all routes, ScamShield performs lexical analysis without outbound SSRF, and the AI assistant blocks prompt injections and secret extractions.
+- **Resolution:**
+  - Implemented 13 dedicated security audit tests in `src/server/tests/securityAudit.test.ts`. All 13 tests passed.
+  - Executed entire test suite (`npm run test`): all 83 automated test assertions passed across 7 test suites with 0 failures against live Neon PostgreSQL.
+  - Verified live Neon database state: `npm run db:check` confirmed all tables, enums, foreign keys, and indexes intact, with 0 leftover test rows.
+  - Verified production build and lint: `npm run build` (clean Vite build, 0 errors) and `npm run lint` (0 ESLint errors).
 
 ---
 

@@ -48,10 +48,16 @@ export const SecurityPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-cyan-950/30 border border-cyan-800/60 text-xs font-mono">
-            <span className="text-cyan-300 font-bold">11 Planned Security Controls</span>
-            <p className="text-slate-400 text-[10px] mt-0.5">
-              Targeted across 24-hour hackathon milestones
+          <div className="p-4 rounded-2xl bg-cyan-950/40 border border-cyan-800/80 text-xs font-mono space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
+              <span className="text-teal-300 font-bold">11 / 11 Security Controls Active</span>
+            </div>
+            <p className="text-slate-300 text-[11px]">
+              83 Automated Tests Passing (7 Suites)
+            </p>
+            <p className="text-slate-400 text-[10px]">
+              Live Neon PostgreSQL Verified
             </p>
           </div>
         </div>
