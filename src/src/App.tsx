@@ -26,8 +26,10 @@ import { authApi } from './services/authApi';
 import { transactionApi } from './services/transactionApi';
 import { budgetApi, mapBackendBudgetToFrontend } from './services/budgetApi';
 import { dashboardApi, type DashboardSummaryResponse } from './services/dashboardApi';
+import { useI18n } from './i18n';
 
 export function App() {
+  const { getLocalizedError } = useI18n();
   const [currentView, setCurrentView] = useState<AppView>('landing');
   const [user, setUser] = useState<UserProfile>(INITIAL_USER);
   const [transactions, setTransactions] = useState<Transaction[]>(INITIAL_TRANSACTIONS);
@@ -52,7 +54,7 @@ export function App() {
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Unable to synchronize transactions';
-      setTransactionError(msg);
+      setTransactionError(getLocalizedError(msg));
     } finally {
       setIsLoadingTransactions(false);
     }
@@ -68,7 +70,7 @@ export function App() {
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Unable to synchronize budgets';
-      setBudgetError(msg);
+      setBudgetError(getLocalizedError(msg));
     } finally {
       setIsLoadingBudgets(false);
     }

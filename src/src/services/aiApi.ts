@@ -9,12 +9,12 @@ export interface AiAssistantResponse {
 }
 
 export const aiApi = {
-  async ask(message: string): Promise<AiAssistantResponse> {
+  async ask(message: string, language: 'en' | 'te' | 'hi' = 'en'): Promise<AiAssistantResponse> {
     const res = await fetch('/api/ai/assistant', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body: JSON.stringify({ message }),
+      body: JSON.stringify({ message, language }),
     });
 
     if (!res.ok) {

@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import type { Budget, TransactionCategory } from '../types';
 import { Modal } from '../components/Modal';
+import { useI18n } from '../i18n';
 
 interface BudgetsPageProps {
   budgets: Budget[];
@@ -42,6 +43,7 @@ export const BudgetsPage: React.FC<BudgetsPageProps> = ({
   onDeleteBudget,
   onRefresh,
 }) => {
+  const { t, formatCurrency } = useI18n();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
@@ -94,10 +96,10 @@ export const BudgetsPage: React.FC<BudgetsPageProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-white tracking-tight">
-            Category Budgets
+            {t('budgets.title')}
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Establish spending caps with proactive 80% warning and 100% exceeded threshold alerts
+            {t('budgets.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -106,7 +108,8 @@ export const BudgetsPage: React.FC<BudgetsPageProps> = ({
               onClick={onRefresh}
               disabled={isLoading}
               className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white transition-all disabled:opacity-50"
-              title="Refresh Budgets"
+              title={t('common.refresh')}
+              aria-label={t('common.refresh')}
             >
               <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-cyan-400' : ''}`} />
             </button>
@@ -115,7 +118,7 @@ export const BudgetsPage: React.FC<BudgetsPageProps> = ({
             onClick={() => setIsModalOpen(true)}
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-lg shadow-cyan-500/20 transition-all hover:scale-105"
           >
-            <Plus className="w-4 h-4" /> Create Category Budget
+            <Plus className="w-4 h-4" /> {t('budgets.createBudgetBtn')}
           </button>
         </div>
       </div>
@@ -132,7 +135,7 @@ export const BudgetsPage: React.FC<BudgetsPageProps> = ({
               onClick={onRefresh}
               className="text-cyan-400 hover:underline font-mono text-xs ml-3"
             >
-              Retry Sync
+              {t('common.refresh')}
             </button>
           )}
         </div>
@@ -146,10 +149,10 @@ export const BudgetsPage: React.FC<BudgetsPageProps> = ({
           </div>
           <div>
             <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">
-              Total Budget Ceiling (Current Period)
+              {t('budgets.monthLabel', { month })}
             </span>
             <h3 className="text-2xl font-extrabold text-white">
-              ₹{totalSpent.toLocaleString('en-IN')} / ₹{totalAllocated.toLocaleString('en-IN')}
+              {formatCurrency(totalSpent)} / {formatCurrency(totalAllocated)}
             </h3>
           </div>
         </div>
@@ -157,15 +160,15 @@ export const BudgetsPage: React.FC<BudgetsPageProps> = ({
         <div className="flex items-center gap-4 text-xs font-mono">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-teal-400"></span>
-            <span className="text-slate-300">Healthy (&lt;80%)</span>
+            <span className="text-slate-300">{t('common.safeTitle')} (&lt;80%)</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-            <span className="text-slate-300">Warning (80%-99%)</span>
+            <span className="text-slate-300">{t('common.warningTitle')} (80%-99%)</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-            <span className="text-slate-300">Exceeded (&ge;100%)</span>
+            <span className="text-slate-300">{t('common.exceededTitle')} (&ge;100%)</span>
           </div>
         </div>
       </div>
@@ -175,21 +178,21 @@ export const BudgetsPage: React.FC<BudgetsPageProps> = ({
         <div className="p-12 text-center text-slate-400">
           <div className="flex items-center justify-center gap-2">
             <div className="w-5 h-5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
-            <span>Calculating live category balances from PostgreSQL ledger...</span>
+            <span>{t('common.loading')}</span>
           </div>
         </div>
       ) : budgets.length === 0 ? (
         <div className="bg-[#0c1322] border border-slate-800 rounded-3xl p-12 text-center">
           <PieChart className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-          <h3 className="text-base font-bold text-white mb-1">No Budgets Defined</h3>
+          <h3 className="text-base font-bold text-white mb-1">{t('budgets.emptyTitle')}</h3>
           <p className="text-xs text-slate-400 max-w-sm mx-auto mb-4">
-            You have not set any spending caps for this period. Create a budget to monitor category expenditures and prevent fraud risks.
+            {t('budgets.emptySubtitle')}
           </p>
           <button
             onClick={() => setIsModalOpen(true)}
             className="px-4 py-2 rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/30 font-semibold text-xs"
           >
-            Create Your First Budget
+            {t('budgets.createBudgetBtn')}
           </button>
         </div>
       ) : (
@@ -219,15 +222,15 @@ export const BudgetsPage: React.FC<BudgetsPageProps> = ({
                   <div className="flex items-center gap-2">
                     {isExceeded ? (
                       <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-400 bg-rose-950/60 border border-rose-800/80 px-2.5 py-0.5 rounded-full">
-                        <AlertOctagon className="w-3.5 h-3.5" /> Exceeded (100%+)
+                        <AlertOctagon className="w-3.5 h-3.5" /> {t('budgets.statusExceeded')}
                       </span>
                     ) : isWarning ? (
                       <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-400 bg-amber-950/60 border border-amber-800/80 px-2.5 py-0.5 rounded-full">
-                        <AlertTriangle className="w-3.5 h-3.5" /> 80% Warning
+                        <AlertTriangle className="w-3.5 h-3.5" /> {t('budgets.statusWarning')}
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1 text-[11px] font-bold text-teal-400 bg-teal-950/60 border border-teal-800/80 px-2.5 py-0.5 rounded-full">
-                        <CheckCircle2 className="w-3.5 h-3.5" /> Healthy
+                        <CheckCircle2 className="w-3.5 h-3.5" /> {t('budgets.statusSafe')}
                       </span>
                     )}
 
@@ -235,7 +238,8 @@ export const BudgetsPage: React.FC<BudgetsPageProps> = ({
                       <button
                         onClick={() => openEditModal(b)}
                         className="p-1 text-slate-400 hover:text-cyan-400 transition-colors"
-                        title="Edit Limit"
+                        title={t('common.edit')}
+                        aria-label={t('common.edit')}
                       >
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
@@ -243,12 +247,13 @@ export const BudgetsPage: React.FC<BudgetsPageProps> = ({
                     {onDeleteBudget && (
                       <button
                         onClick={() => {
-                          if (confirm(`Delete budget cap for ${b.category}?`)) {
+                          if (confirm(t('budgets.deleteBudgetDesc', { category: b.category }))) {
                             onDeleteBudget(b.id);
                           }
                         }}
                         className="p-1 text-slate-400 hover:text-red-400 transition-colors"
-                        title="Delete Budget"
+                        title={t('common.delete')}
+                        aria-label={t('common.delete')}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -260,20 +265,20 @@ export const BudgetsPage: React.FC<BudgetsPageProps> = ({
                 <div className="space-y-1 mb-4">
                   <div className="flex items-baseline justify-between">
                     <span className="text-2xl font-black text-white font-mono">
-                      ₹{b.spent.toLocaleString('en-IN')}
+                      {formatCurrency(b.spent)}
                     </span>
                     <span className="text-xs text-slate-400 font-mono">
-                      of ₹{b.limit.toLocaleString('en-IN')} limit
+                      {t('budgets.cardLimit', { limit: formatCurrency(b.limit) })}
                     </span>
                   </div>
                   <div className="text-right text-[11px] font-mono">
                     {remaining >= 0 ? (
                       <span className="text-slate-400">
-                        ₹{remaining.toLocaleString('en-IN')} remaining
+                        {t('budgets.cardRemaining', { remaining: formatCurrency(remaining) })}
                       </span>
                     ) : (
                       <span className="text-rose-400 font-semibold">
-                        ₹{Math.abs(remaining).toLocaleString('en-IN')} over budget
+                        {t('budgets.cardExceededBy', { exceeded: formatCurrency(Math.abs(remaining)) })}
                       </span>
                     )}
                   </div>
@@ -295,7 +300,7 @@ export const BudgetsPage: React.FC<BudgetsPageProps> = ({
 
                 {/* Footer percentage */}
                 <div className="mt-3 flex items-center justify-between text-xs text-slate-500 font-mono">
-                  <span>Period: {b.month}</span>
+                  <span>{t('budgets.monthLabel', { month: b.month })}</span>
                   <span
                     className={
                       isExceeded
@@ -305,7 +310,7 @@ export const BudgetsPage: React.FC<BudgetsPageProps> = ({
                         : 'text-slate-300'
                     }
                   >
-                    {percent}% Consumed
+                    {t('budgets.budgetUtilizationNotice', { category: b.category, percentage: percent })}
                   </span>
                 </div>
               </div>
@@ -318,12 +323,12 @@ export const BudgetsPage: React.FC<BudgetsPageProps> = ({
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Create Category Budget"
+        title={t('budgets.modalAddTitle')}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1">
-              Category
+              {t('budgets.modalCategoryLabel')}
             </label>
             <select
               value={category}
@@ -340,7 +345,7 @@ export const BudgetsPage: React.FC<BudgetsPageProps> = ({
 
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1">
-              Budget Limit (₹)
+              {t('budgets.modalLimitLabel')}
             </label>
             <input
               type="number"
@@ -349,14 +354,14 @@ export const BudgetsPage: React.FC<BudgetsPageProps> = ({
               required
               value={limit}
               onChange={(e) => setLimit(e.target.value)}
-              placeholder="e.g. 5000"
+              placeholder={t('budgets.modalLimitPlaceholder')}
               className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-cyan-500"
             />
           </div>
 
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1">
-              Target Month (YYYY-MM)
+              {t('budgets.modalMonthLabel')}
             </label>
             <input
               type="month"
@@ -373,13 +378,13 @@ export const BudgetsPage: React.FC<BudgetsPageProps> = ({
               onClick={() => setIsModalOpen(false)}
               className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
               className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-md shadow-cyan-500/20"
             >
-              Create Budget Cap
+              {t('budgets.saveBudgetBtn')}
             </button>
           </div>
         </form>
@@ -389,12 +394,12 @@ export const BudgetsPage: React.FC<BudgetsPageProps> = ({
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        title={`Edit Budget Cap: ${editingBudget?.category}`}
+        title={t('budgets.modalEditTitle')}
       >
         <form onSubmit={handleEditSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1">
-              New Budget Limit (₹)
+              {t('budgets.modalLimitLabel')}
             </label>
             <input
               type="number"
@@ -413,13 +418,13 @@ export const BudgetsPage: React.FC<BudgetsPageProps> = ({
               onClick={() => setIsEditModalOpen(false)}
               className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
               className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-md shadow-cyan-500/20"
             >
-              Update Budget Limit
+              {t('budgets.saveBudgetBtn')}
             </button>
           </div>
         </form>

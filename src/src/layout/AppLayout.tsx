@@ -15,6 +15,8 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import type { AppView, UserProfile } from '../types';
+import { useI18n } from '../i18n';
+import { LanguageSelector } from '../components/LanguageSelector';
 
 interface AppLayoutProps {
   currentView: AppView;
@@ -32,48 +34,49 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   children,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { t } = useI18n();
 
   const navItems: { view: AppView; label: string; icon: React.ReactNode; badge?: string }[] = [
     {
       view: 'dashboard',
-      label: 'Dashboard',
+      label: t('nav.dashboard'),
       icon: <LayoutDashboard className="w-5 h-5" />,
     },
     {
       view: 'transactions',
-      label: 'Transactions',
+      label: t('nav.transactions'),
       icon: <Receipt className="w-5 h-5" />,
     },
     {
       view: 'budgets',
-      label: 'Budgets',
+      label: t('nav.budgets'),
       icon: <PieChart className="w-5 h-5" />,
     },
     {
       view: 'scamshield',
-      label: 'ScamShield',
+      label: t('nav.scamshield'),
       icon: <ShieldAlert className="w-5 h-5 text-cyan-400" />,
-      badge: 'Protected',
+      badge: t('nav.protectedBadge'),
     },
     {
       view: 'ai-assistant',
-      label: 'AI Assistant',
+      label: t('nav.aiAssistant'),
       icon: <Bot className="w-5 h-5 text-teal-400" />,
-      badge: 'Beta',
+      badge: t('nav.betaBadge'),
     },
     {
       view: 'security',
-      label: 'Security Center',
+      label: t('nav.securityCenter'),
       icon: <Lock className="w-5 h-5" />,
     },
     {
       view: 'reports',
-      label: 'Reports & Export',
+      label: t('nav.reports'),
       icon: <FileSpreadsheet className="w-5 h-5" />,
     },
     {
       view: 'profile',
-      label: 'Profile & RBAC',
+      label: t('nav.profile'),
       icon: <User className="w-5 h-5" />,
     },
   ];
@@ -81,6 +84,20 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   const handleNavClick = (view: AppView) => {
     onNavigate(view);
     setMobileMenuOpen(false);
+  };
+
+  const getPageTitle = (view: AppView) => {
+    switch (view) {
+      case 'dashboard': return t('nav.dashboard');
+      case 'transactions': return t('nav.transactions');
+      case 'budgets': return t('nav.budgets');
+      case 'scamshield': return t('nav.scamshield');
+      case 'ai-assistant': return t('nav.aiAssistant');
+      case 'security': return t('nav.securityCenter');
+      case 'reports': return t('nav.reports');
+      case 'profile': return t('nav.profile');
+      default: return view;
+    }
   };
 
   return (
@@ -95,13 +112,16 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             Fin<span className="text-cyan-400">Shield</span>
           </span>
         </div>
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2 text-slate-400 hover:text-white"
-          aria-label="Toggle menu"
-        >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
+        <div className="flex items-center gap-2">
+          <LanguageSelector variant="compact" />
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-2 text-slate-400 hover:text-white"
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
       </header>
 
       {/* Sidebar Navigation */}
@@ -124,7 +144,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                 Fin<span className="text-cyan-400">Shield</span>
               </div>
               <p className="text-[10px] uppercase tracking-widest text-slate-400 font-mono">
-                Team 50 • Tech Tribe
+                {t('common.subtitle')}
               </p>
             </div>
           </div>
@@ -132,6 +152,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             <button
               onClick={() => setMobileMenuOpen(false)}
               className="md:hidden p-1 text-slate-400"
+              aria-label={t('common.close')}
             >
               <X className="w-5 h-5" />
             </button>
@@ -142,8 +163,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         <div className="mx-4 my-3 p-2.5 rounded-xl bg-cyan-950/30 border border-cyan-800/40 flex items-center gap-2.5">
           <ShieldCheck className="w-4 h-4 text-cyan-400 shrink-0" />
           <div className="text-xs">
-            <span className="font-medium text-cyan-300">ScamShield Active</span>
-            <p className="text-[10px] text-slate-400">Zero fraud reported</p>
+            <span className="font-medium text-cyan-300">{t('nav.scamShieldActive')}</span>
+            <p className="text-[10px] text-slate-400">{t('nav.zeroFraudReported')}</p>
           </div>
         </div>
 
@@ -201,7 +222,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             </div>
             <button
               onClick={onLogout}
-              title="Logout"
+              title={t('nav.logout')}
+              aria-label={t('nav.logout')}
               className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition-colors"
             >
               <LogOut className="w-4 h-4" />
@@ -212,29 +234,31 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top bar with quick navigation back to landing page */}
+        {/* Top bar with language selector and quick navigation */}
         <header className="hidden md:flex items-center justify-between px-8 py-4 border-b border-slate-800/60 bg-[#090e1a]/40 backdrop-blur-md">
           <div className="flex items-center gap-3">
-            <h1 className="text-base font-semibold text-slate-200 capitalize">
-              {currentView.replace('-', ' ')}
+            <h1 className="text-base font-semibold text-slate-200">
+              {getPageTitle(currentView)}
             </h1>
             <span className="text-xs text-slate-500">•</span>
             <span className="text-xs text-slate-400">
-              Build Secure 24 — Official Track PS-01
+              {t('common.buildSecureTrack')}
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
+            <LanguageSelector />
+            <div className="h-4 w-[1px] bg-slate-800"></div>
             <button
               onClick={() => onNavigate('landing')}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-slate-400 hover:text-cyan-300 hover:bg-slate-800/50 rounded-lg border border-slate-800 transition-colors"
             >
-              Landing Page <ExternalLink className="w-3 h-3" />
+              {t('nav.landingPage')} <ExternalLink className="w-3 h-3" />
             </button>
             <div className="h-4 w-[1px] bg-slate-800"></div>
             <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
               <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
-              Mainnet Guard Active
+              {t('common.mainnetGuardActive')}
             </div>
           </div>
         </header>

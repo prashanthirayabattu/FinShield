@@ -16,6 +16,7 @@ import type { Transaction, Budget, AppView, TransactionCategory } from '../types
 import type { DashboardSummaryResponse } from '../services/dashboardApi';
 import { StatCard } from '../components/StatCard';
 import { Badge } from '../components/Badge';
+import { useI18n } from '../i18n';
 
 interface DashboardPageProps {
   transactions: Transaction[];
@@ -34,6 +35,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   onNavigate,
   onRefresh,
 }) => {
+  const { t, formatCurrency, formatDate } = useI18n();
+
   // Use live PostgreSQL summary data if available, otherwise compute from local state
   const totalIncome = summary ? summary.totalIncome : transactions
     .filter((t) => t.type === 'INCOME')
@@ -105,14 +108,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gradient-to-r from-[#0c1424] via-[#0e182c] to-[#0a1220] border border-cyan-900/40 rounded-3xl p-6 sm:p-8">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <Badge variant="cyan">PS-01 Personal Finance</Badge>
-            <Badge variant="teal">Neon PostgreSQL Live</Badge>
+            <Badge variant="cyan">{t('dashboard.trackBadge')}</Badge>
+            <Badge variant="teal">{t('common.liveNeonPostgres')}</Badge>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Financial Health & Security Overview
+            {t('dashboard.title')}
           </h2>
           <p className="text-sm text-slate-400 mt-1 max-w-xl">
-            Live personal ledger, real-time budget threshold warnings, and mathematical consistency verified from PostgreSQL.
+            {t('dashboard.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -121,7 +124,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               onClick={onRefresh}
               disabled={isLoading}
               className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white transition-all disabled:opacity-50"
-              title="Refresh Dashboard Summary"
+              title={t('common.refresh')}
+              aria-label={t('common.refresh')}
             >
               <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-cyan-400' : ''}`} />
             </button>
@@ -130,13 +134,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             onClick={() => onNavigate('transactions')}
             className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-md shadow-cyan-500/20 transition-all"
           >
-            + Add Transaction
+            {t('dashboard.addTransaction')}
           </button>
           <button
             onClick={() => onNavigate('scamshield')}
             className="px-4 py-2.5 rounded-xl bg-slate-900 border border-cyan-800/60 hover:border-cyan-400 text-cyan-300 font-semibold text-xs transition-all flex items-center gap-1.5"
           >
-            <ShieldAlert className="w-3.5 h-3.5" /> Scan Scam
+            <ShieldAlert className="w-3.5 h-3.5" /> {t('dashboard.scanScam')}
           </button>
         </div>
       </div>
@@ -150,7 +154,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             </div>
             <div>
               <h4 className="text-sm font-bold text-amber-200">
-                Budget Threshold Warning: {budgetAlerts.length} Categories Requiring Attention
+                {t('dashboard.budgetAlertTitle', { count: budgetAlerts.length })}
               </h4>
               <p className="text-xs text-amber-300/80">
                 {budgetAlerts.map((a) => `${a.category} (${a.status}: ${a.percentageUsed}%)`).join(', ')}
@@ -161,7 +165,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             onClick={() => onNavigate('budgets')}
             className="text-xs font-semibold text-amber-300 hover:text-white underline font-mono"
           >
-            Adjust Budget Caps
+            {t('dashboard.viewBudgets')}
           </button>
         </div>
       )}
@@ -169,30 +173,30 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       {/* 4 Core Financial Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <StatCard
-          title="Current Balance"
-          value={`₹${totalBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
-          subtitle="Net liquid balance (Income - Expense)"
+          title={t('dashboard.currentBalance')}
+          value={formatCurrency(totalBalance)}
+          subtitle={t('dashboard.activeLedger')}
           accent="cyan"
           icon={<Wallet className="w-5 h-5" />}
         />
         <StatCard
-          title="Total Income"
-          value={`₹${totalIncome.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
-          subtitle="Verified incoming ledger"
+          title={t('dashboard.totalIncome')}
+          value={formatCurrency(totalIncome)}
+          subtitle={t('dashboard.cashFlow')}
           accent="teal"
           icon={<TrendingUp className="w-5 h-5" />}
         />
         <StatCard
-          title="Total Expenses"
-          value={`₹${totalExpenses.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
-          subtitle="All categories combined"
+          title={t('dashboard.totalExpenses')}
+          value={formatCurrency(totalExpenses)}
+          subtitle={t('dashboard.spentThisMonth')}
           accent="purple"
           icon={<TrendingDown className="w-5 h-5" />}
         />
         <StatCard
-          title="Savings Rate"
+          title={t('dashboard.savingsRate')}
           value={`${savingsRate}%`}
-          subtitle="Income retained as savings"
+          subtitle={t('dashboard.ofIncomeSaved', { rate: savingsRate })}
           accent="teal"
           icon={<PiggyBank className="w-5 h-5" />}
         />
@@ -205,25 +209,28 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           <div className="flex items-center justify-between mb-5">
             <div>
               <h3 className="text-base font-bold text-slate-100">
-                Budget Ceilings & Utilization
+                {t('dashboard.budgetUtilization')}
               </h3>
               <p className="text-xs text-slate-400 mt-0.5">
-                Calculated live from PostgreSQL expense rows
+                {t('dashboard.totalBudgetCap', {
+                  limit: formatCurrency(totalBudgetLimit),
+                  spent: formatCurrency(totalBudgetSpent),
+                })}
               </p>
             </div>
             <button
               onClick={() => onNavigate('budgets')}
               className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 inline-flex items-center gap-1"
             >
-              All Budgets <ArrowRight className="w-3.5 h-3.5" />
+              {t('dashboard.viewBudgets')} <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
           <div className="mb-6">
             <div className="flex items-center justify-between text-xs font-medium text-slate-300 mb-2">
-              <span>Overall Utilization</span>
+              <span>{t('budgets.overallUtilization')}</span>
               <span className="font-mono text-cyan-300">
-                ₹{totalBudgetSpent.toLocaleString('en-IN')} / ₹{totalBudgetLimit.toLocaleString('en-IN')} ({totalBudgetPercent}%)
+                {formatCurrency(totalBudgetSpent)} / {formatCurrency(totalBudgetLimit)} ({totalBudgetPercent}%)
               </span>
             </div>
             <div className="w-full h-3 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
@@ -244,7 +251,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           <div className="space-y-4">
             {activeBudgets.length === 0 ? (
               <div className="p-6 text-center text-slate-500 text-xs">
-                No active budget caps. Configure caps in the Budgets section.
+                {t('budgets.emptySubtitle')}
               </div>
             ) : (
               activeBudgets.slice(0, 3).map((b) => {
@@ -259,7 +266,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                         {b.category}
                       </span>
                       <span className="text-xs font-mono text-slate-400">
-                        ₹{b.spent.toLocaleString('en-IN')} of ₹{b.limit.toLocaleString('en-IN')}
+                        {formatCurrency(b.spent)} / {formatCurrency(b.limit)}
                       </span>
                     </div>
                     <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
@@ -271,20 +278,22 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                       ></div>
                     </div>
                     <div className="mt-1.5 flex items-center justify-between text-[11px]">
-                      <span className="text-slate-500 font-mono">{pct}% consumed</span>
+                      <span className="text-slate-500 font-mono">
+                        {t('budgets.budgetUtilizationNotice', { category: b.category, percentage: pct })}
+                      </span>
                       {isExceeded && (
                         <span className="text-rose-400 font-medium inline-flex items-center gap-1">
-                          <AlertOctagon className="w-3 h-3" /> Exceeded (100%+)
+                          <AlertOctagon className="w-3 h-3" /> {t('common.exceededTitle')}
                         </span>
                       )}
                       {isWarning && (
                         <span className="text-amber-400 font-medium inline-flex items-center gap-1">
-                          <AlertTriangle className="w-3 h-3" /> Warning (80%+)
+                          <AlertTriangle className="w-3 h-3" /> {t('common.warningTitle')}
                         </span>
                       )}
                       {!isExceeded && !isWarning && (
                         <span className="text-teal-400 font-medium inline-flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3" /> Safe
+                          <CheckCircle2 className="w-3 h-3" /> {t('common.safeTitle')}
                         </span>
                       )}
                     </div>
@@ -300,21 +309,21 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           <div className="flex items-center justify-between mb-5">
             <div>
               <h3 className="text-base font-bold text-slate-100">
-                Spending by Category
+                {t('dashboard.spendingByCategory')}
               </h3>
               <p className="text-xs text-slate-400 mt-0.5">
-                Aggregated expenditure shares from database
+                {t('dashboard.subtitle')}
               </p>
             </div>
             <span className="text-xs font-mono text-slate-400">
-              {categoryBreakdownList.length} Categories
+              {categoryBreakdownList.length} {t('common.all')}
             </span>
           </div>
 
           <div className="space-y-3">
             {categoryBreakdownList.length === 0 ? (
               <div className="p-6 text-center text-slate-500 text-xs">
-                No expense transactions recorded yet.
+                {t('dashboard.noExpensesRecorded')}
               </div>
             ) : (
               categoryBreakdownList.map((item) => (
@@ -327,13 +336,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     <div>
                       <p className="text-xs font-semibold text-slate-200">{item.category}</p>
                       <p className="text-[10px] text-slate-500 font-mono">
-                        {item.percentage}% of total expenses ({item.count} items)
+                        {item.percentage}% ({item.count} items)
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
                     <p className="text-xs font-bold text-slate-100 font-mono">
-                      ₹{item.total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                      {formatCurrency(item.total)}
                     </p>
                   </div>
                 </div>
@@ -350,10 +359,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             <Receipt className="w-5 h-5 text-cyan-400" />
             <div>
               <h3 className="text-base font-bold text-slate-100">
-                Recent Transactions
+                {t('dashboard.recentTransactions')}
               </h3>
               <p className="text-xs text-slate-400">
-                Latest transactions persisted in PostgreSQL
+                {t('dashboard.subtitle')}
               </p>
             </div>
           </div>
@@ -361,7 +370,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             onClick={() => onNavigate('transactions')}
             className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 inline-flex items-center gap-1"
           >
-            View All Ledger <ArrowRight className="w-3.5 h-3.5" />
+            {t('dashboard.viewAllTransactions')} <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
@@ -369,57 +378,54 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-slate-800 text-slate-400 font-mono">
-                <th className="pb-3 font-medium">Date</th>
-                <th className="pb-3 font-medium">Description</th>
-                <th className="pb-3 font-medium">Payee / Entity</th>
-                <th className="pb-3 font-medium">Category</th>
-                <th className="pb-3 font-medium">Type</th>
-                <th className="pb-3 font-medium text-right">Amount</th>
-                <th className="pb-3 font-medium text-center">Status</th>
+                <th className="pb-3 font-medium">{t('common.date')}</th>
+                <th className="pb-3 font-medium">{t('common.description')}</th>
+                <th className="pb-3 font-medium">{t('common.payee')}</th>
+                <th className="pb-3 font-medium">{t('common.category')}</th>
+                <th className="pb-3 font-medium">{t('common.type')}</th>
+                <th className="pb-3 font-medium text-right">{t('common.amount')}</th>
+                <th className="pb-3 font-medium text-center">{t('common.status')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60">
               {recentList.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-8 text-center text-slate-500">
-                    No transactions recorded yet.
+                    {t('dashboard.noTransactionsFound')}
                   </td>
                 </tr>
               ) : (
-                recentList.map((t) => (
-                  <tr key={t.id} className="hover:bg-slate-900/40 transition-colors">
-                    <td className="py-3 font-mono text-slate-400">{t.date}</td>
-                    <td className="py-3 font-medium text-slate-200">{t.description}</td>
-                    <td className="py-3 text-slate-400">{t.payee}</td>
+                recentList.map((item) => (
+                  <tr key={item.id} className="hover:bg-slate-900/40 transition-colors">
+                    <td className="py-3 font-mono text-slate-400">{formatDate(item.date)}</td>
+                    <td className="py-3 font-medium text-slate-200">{item.description}</td>
+                    <td className="py-3 text-slate-400">{item.payee}</td>
                     <td className="py-3">
                       <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-[11px] text-slate-300">
-                        {t.category}
+                        {item.category}
                       </span>
                     </td>
                     <td className="py-3 font-mono">
                       <span
                         className={`text-[11px] font-bold ${
-                          t.type === 'INCOME' ? 'text-teal-400' : 'text-slate-400'
+                          item.type === 'INCOME' ? 'text-teal-400' : 'text-slate-400'
                         }`}
                       >
-                        {t.type}
+                        {item.type === 'INCOME' ? t('transactions.incomeBadge') : t('transactions.expenseBadge')}
                       </span>
                     </td>
                     <td className="py-3 text-right font-mono font-bold">
                       <span
                         className={
-                          t.type === 'INCOME' ? 'text-teal-400' : 'text-slate-100'
+                          item.type === 'INCOME' ? 'text-teal-400' : 'text-slate-100'
                         }
                       >
-                        {t.type === 'INCOME' ? '+' : '-'}₹
-                        {t.amount.toLocaleString('en-IN', {
-                          minimumFractionDigits: 2,
-                        })}
+                        {item.type === 'INCOME' ? '+' : '-'}{formatCurrency(item.amount)}
                       </span>
                     </td>
                     <td className="py-3 text-center">
                       <span className="inline-flex items-center gap-1 text-[10px] text-teal-400 bg-teal-950/60 border border-teal-800 px-2 py-0.5 rounded-full">
-                        <CheckCircle2 className="w-3 h-3" /> Stored
+                        <CheckCircle2 className="w-3 h-3" /> {t('common.confirmed')}
                       </span>
                     </td>
                   </tr>

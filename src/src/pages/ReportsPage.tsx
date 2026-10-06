@@ -9,12 +9,14 @@ import {
 } from 'lucide-react';
 import type { Transaction } from '../types';
 import { Badge } from '../components/Badge';
+import { useI18n } from '../i18n';
 
 interface ReportsPageProps {
   transactions: Transaction[];
 }
 
 export const ReportsPage: React.FC<ReportsPageProps> = ({ transactions }) => {
+  const { t } = useI18n();
   const [downloadSuccess, setDownloadSuccess] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [exportError, setExportError] = useState<string | null>(null);
@@ -27,7 +29,7 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ transactions }) => {
         credentials: 'include',
       });
       if (!res.ok) {
-        throw new Error('Export request failed. Ensure you are signed in.');
+        throw new Error(t('errors.authRequired'));
       }
       const blob = await res.blob();
       const blobUrl = window.URL.createObjectURL(blob);
@@ -38,10 +40,10 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ transactions }) => {
       link.click();
       window.URL.revokeObjectURL(blobUrl);
       document.body.removeChild(link);
-      setDownloadSuccess('Personal Financial CSV (CWE-1236 Sanitized)');
+      setDownloadSuccess('CSV');
       setTimeout(() => setDownloadSuccess(null), 4000);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Export failed';
+      const msg = err instanceof Error ? err.message : t('common.error');
       setExportError(msg);
       setTimeout(() => setExportError(null), 4000);
     } finally {
@@ -49,8 +51,8 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ transactions }) => {
     }
   };
 
-  const handleSimulateExport = (type: string) => {
-    setDownloadSuccess(type);
+  const handleSimulateExport = (name: string) => {
+    setDownloadSuccess(name);
     setTimeout(() => {
       setDownloadSuccess(null);
     }, 4000);
@@ -62,14 +64,14 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ transactions }) => {
       <div className="bg-gradient-to-r from-[#0c1626] via-[#091522] to-[#070e1c] border border-cyan-800/40 rounded-3xl p-6 sm:p-8">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <Badge variant="cyan">PS-01 Personal Data Export</Badge>
-            <Badge variant="teal">CSV Injection Defense (ADR-007 / CWE-1236)</Badge>
+            <Badge variant="cyan">{t('dashboard.trackBadge')}</Badge>
+            <Badge variant="teal">CWE-1236</Badge>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Financial Reports & Export Center
+            {t('reports.title')}
           </h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl leading-relaxed">
-            Generate and export personal ledger summaries and security posture audits. CSV downloads enforce strict single-quote prefix sanitization against Dynamic Data Exchange (DDE) formula injection.
+            {t('reports.subtitle')}
           </p>
         </div>
       </div>
@@ -80,10 +82,10 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ transactions }) => {
           <div className="flex items-center gap-2.5">
             <CheckCircle2 className="w-5 h-5 text-teal-400" />
             <span>
-              Secure export downloaded: <strong>{downloadSuccess}</strong>
+              {t('common.success')}: <strong>{downloadSuccess}</strong>
             </span>
           </div>
-          <span className="font-mono text-[10px] text-teal-400">Zero Formula Injection</span>
+          <span className="font-mono text-[10px] text-teal-400">{t('dashboard.formulaSanitized')}</span>
         </div>
       )}
 
@@ -103,15 +105,15 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ transactions }) => {
               <FileSpreadsheet className="w-6 h-6" />
             </div>
             <h3 className="text-lg font-bold text-white mb-1.5">
-              1. Personal Financial CSV
+              1. {t('reports.exportBtn')}
             </h3>
             <p className="text-xs text-slate-400 leading-relaxed mb-4">
-              Export all income and expense records formatted for spreadsheet software. Includes dates, categories, payees, and amounts.
+              {t('reports.subtitle')}
             </p>
             <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-[11px] font-mono text-slate-400 space-y-1">
-              <div>Total Rows: {transactions.length} records</div>
+              <div>{t('common.actions')}: {transactions.length} {t('common.all')}</div>
               <div>Format: UTF-8 CSV</div>
-              <div>Protection: DDE Prefix Sanitized (CWE-1236)</div>
+              <div>Protection: CWE-1236</div>
             </div>
           </div>
 
@@ -120,7 +122,7 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ transactions }) => {
             disabled={isExporting}
             className="mt-6 w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all disabled:opacity-50"
           >
-            <Download className="w-4 h-4" /> {isExporting ? 'Generating CSV...' : 'Export Secure CSV'}
+            <Download className="w-4 h-4" /> {isExporting ? t('reports.exporting') : t('reports.exportBtn')}
           </button>
         </div>
 
@@ -131,23 +133,23 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ transactions }) => {
               <Shield className="w-6 h-6" />
             </div>
             <h3 className="text-lg font-bold text-white mb-1.5">
-              2. Security & Scam Audit
+              2. {t('security.auditScore')}
             </h3>
             <p className="text-xs text-slate-400 leading-relaxed mb-4">
-              Comprehensive breakdown of ScamShield scans, flagged UPI transactions, and tenant security verification logs.
+              {t('security.testSummary')}
             </p>
             <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-[11px] font-mono text-slate-400 space-y-1">
-              <div>Flagged Scams: 1 Incident</div>
-              <div>Heuristic Engine: Operational</div>
-              <div>Audit Integrity: Tamper-Evident</div>
+              <div>{t('nav.scamShieldActive')}</div>
+              <div>{t('common.mainnetGuardActive')}</div>
+              <div>{t('common.liveNeonPostgres')}</div>
             </div>
           </div>
 
           <button
-            onClick={() => handleSimulateExport('Security & Scam Audit Report')}
+            onClick={() => handleSimulateExport(t('security.auditScore'))}
             className="mt-6 w-full py-2.5 rounded-xl bg-slate-900 border border-teal-800/80 hover:border-teal-400 text-teal-300 font-semibold text-xs flex items-center justify-center gap-2 transition-all"
           >
-            <Download className="w-4 h-4" /> Download Security Audit
+            <Download className="w-4 h-4" /> {t('security.auditScore')}
           </button>
         </div>
 
@@ -158,23 +160,23 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ transactions }) => {
               <FileText className="w-6 h-6" />
             </div>
             <h3 className="text-lg font-bold text-white mb-1.5">
-              3. Monthly Financial Summary
+              3. {t('reports.summaryTitle')}
             </h3>
             <p className="text-xs text-slate-400 leading-relaxed mb-4">
-              Aggregated monthly spending digest containing category breakdown, savings retention percentage, and budget performance.
+              {t('dashboard.subtitle')}
             </p>
             <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-[11px] font-mono text-slate-400 space-y-1">
-              <div>Month: October 2026</div>
-              <div>Income Tracked: ₹52,000.00</div>
-              <div>Expense Tracked: ₹12,888.00</div>
+              <div>{t('budgets.monthLabel', { month: '2026-10' })}</div>
+              <div>{t('dashboard.totalIncome')}</div>
+              <div>{t('dashboard.totalExpenses')}</div>
             </div>
           </div>
 
           <button
-            onClick={() => handleSimulateExport('Monthly Financial Summary')}
+            onClick={() => handleSimulateExport(t('reports.summaryTitle'))}
             className="mt-6 w-full py-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 font-semibold text-xs flex items-center justify-center gap-2 transition-all"
           >
-            <Download className="w-4 h-4" /> Generate Digest
+            <Download className="w-4 h-4" /> {t('reports.summaryTitle')}
           </button>
         </div>
       </div>
@@ -182,10 +184,10 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ transactions }) => {
       {/* CSV Security Explainer */}
       <div className="p-5 rounded-2xl bg-[#0c1322] border border-slate-800 text-xs text-slate-400 space-y-2">
         <h4 className="font-bold text-slate-200 flex items-center gap-2">
-          <Lock className="w-4 h-4 text-cyan-400" /> Secure File Handling Specification (ADR-007)
+          <Lock className="w-4 h-4 text-cyan-400" /> {t('reports.formulaDefenseTitle')}
         </h4>
         <p className="leading-relaxed">
-          Spreadsheet applications (Microsoft Excel, LibreOffice, Google Sheets) automatically execute dynamic formulas when cell values begin with <code>=</code>, <code>+</code>, <code>-</code>, or <code>@</code>. FinShield's backend export pipeline enforces automatic single-quote prefix escaping to completely eliminate Dynamic Data Exchange (DDE) command injection exploits.
+          {t('reports.formulaDefenseDesc')}
         </p>
       </div>
     </div>

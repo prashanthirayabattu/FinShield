@@ -9,6 +9,11 @@ export const askAiAssistantSchema = z
       .trim()
       .min(1, 'message cannot be empty')
       .max(1000, 'message exceeds maximum allowable length of 1000 characters'),
+    language: z
+      .enum(['en', 'te', 'hi'], {
+        error: "language must be one of 'en', 'te', or 'hi'",
+      })
+      .default('en'),
     conversationHistory: z
       .array(
         z

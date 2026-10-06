@@ -14,8 +14,10 @@ import {
 } from 'lucide-react';
 import { Badge } from '../components/Badge';
 import { scamApi, type ScamAnalysisResponse } from '../services/scamApi';
+import { useI18n } from '../i18n';
 
 export const ScamShieldPage: React.FC = () => {
+  const { t, formatCurrency, formatDate } = useI18n();
   const [activeTab, setActiveTab] = useState<'MESSAGE' | 'URL' | 'UPI'>('MESSAGE');
   const [inputValue, setInputValue] = useState('');
   const [isInspecting, setIsInspecting] = useState(false);
@@ -24,41 +26,31 @@ export const ScamShieldPage: React.FC = () => {
 
   const samplePresets = [
     {
-      label: 'KYC Suspension Scam',
+      label: t('scamshield.presetKyc'),
       tab: 'MESSAGE' as const,
       text: 'Dear customer, your SBI bank account and KYC will be blocked within 24 hours immediately. Update PAN card now at http://sbi-kyc-verify-portal.xyz',
     },
     {
-      label: 'OTP Phishing Lure',
-      tab: 'MESSAGE' as const,
-      text: 'Please share your 6-digit OTP and UPI PIN immediately to verify your transaction refund.',
-    },
-    {
-      label: 'Utility Disconnection Threat',
+      label: t('scamshield.presetElectricity'),
       tab: 'MESSAGE' as const,
       text: 'Dear consumer, your electricity power bill was unpaid. Power will be disconnected tonight at 9:30 PM. Call power officer immediately.',
     },
     {
-      label: 'Phishing URL Check',
-      tab: 'URL' as const,
-      text: 'http://sbi-kyc-verify-portal.xyz/login',
-    },
-    {
-      label: 'Fraudulent Support UPI',
-      tab: 'UPI' as const,
-      text: 'refund.support@oksbi',
-    },
-    {
-      label: 'Routine Split Bill (Safe)',
+      label: t('scamshield.presetLottery'),
       tab: 'MESSAGE' as const,
-      text: 'Hey Rohit, please send the restaurant dinner bill split of ₹500 when you get home.',
+      text: 'Congratulations! You won ₹25,00,000 in Kaun Banega Crorepati lucky draw lottery. Send processing fee immediately to claim prize.',
+    },
+    {
+      label: t('scamshield.presetJob'),
+      tab: 'MESSAGE' as const,
+      text: 'Earn ₹5000 daily from home by liking YouTube videos. Deposit refundable security fee of ₹1500 to activate VIP task.',
     },
   ];
 
   const handleInspect = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim()) {
-      setError('Please enter a message, URL, or UPI ID to inspect.');
+      setError(t('errors.invalidInput'));
       return;
     }
 
@@ -91,6 +83,12 @@ export const ScamShieldPage: React.FC = () => {
     setError(null);
   };
 
+  const getLocalizedRiskBadge = (level: string) => {
+    if (level === 'HIGH') return t('scamshield.riskHigh');
+    if (level === 'MEDIUM') return t('scamshield.riskMedium');
+    return t('scamshield.riskLow');
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Top Banner */}
@@ -98,23 +96,23 @@ export const ScamShieldPage: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Badge variant="cyan">Integrated Fraud Protection Layer</Badge>
-              <Badge variant="teal">FinShield Exclusive</Badge>
+              <Badge variant="cyan">{t('nav.protectedBadge')}</Badge>
+              <Badge variant="teal">{t('common.brand')}</Badge>
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-              ScamShield Fraud Inspection Hub
+              {t('scamshield.title')}
             </h2>
             <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl leading-relaxed">
-              Real-time heuristic evaluation of suspicious payment requests, phishing URLs, and fraudulent UPI addresses before you authorize ledger transfers.
+              {t('scamshield.subtitle')}
             </p>
           </div>
 
           <div className="px-4 py-3 rounded-2xl bg-cyan-950/40 border border-cyan-800/60 flex items-center gap-3">
             <ShieldCheck className="w-6 h-6 text-cyan-400 shrink-0" />
             <div className="text-xs font-mono">
-              <span className="text-cyan-300 font-bold">Ledger Cross-Check</span>
+              <span className="text-cyan-300 font-bold">{t('scamshield.transactionLinkingTitle')}</span>
               <p className="text-slate-400 text-[10px]">
-                Matches scam queries to personal ledger transactions
+                {t('scamshield.heuristicNotice')}
               </p>
             </div>
           </div>
@@ -123,7 +121,9 @@ export const ScamShieldPage: React.FC = () => {
 
       {/* Preset Scenarios */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
-        <span className="text-slate-400 text-xs font-semibold shrink-0">Quick Presets:</span>
+        <span className="text-slate-400 text-xs font-semibold shrink-0">
+          {t('scamshield.quickPresetsTitle')}
+        </span>
         {samplePresets.map((preset, idx) => (
           <button
             key={idx}
@@ -165,10 +165,10 @@ export const ScamShieldPage: React.FC = () => {
                 activeTab === 'MESSAGE' ? 'text-white' : 'text-slate-300'
               }`}
             >
-              1. Suspicious Message Check
+              1. {t('common.description')}
             </h4>
             <p className="text-[11px] text-slate-400 mt-0.5">
-              Inspect SMS, WhatsApp & lottery lures
+              SMS, WhatsApp & Chat
             </p>
           </div>
         </button>
@@ -200,10 +200,10 @@ export const ScamShieldPage: React.FC = () => {
                 activeTab === 'URL' ? 'text-white' : 'text-slate-300'
               }`}
             >
-              2. Phishing URL Check
+              2. URL Link
             </h4>
             <p className="text-[11px] text-slate-400 mt-0.5">
-              SSRF-safe lexical inspection of links
+              SSRF-safe Web Links
             </p>
           </div>
         </button>
@@ -235,10 +235,10 @@ export const ScamShieldPage: React.FC = () => {
                 activeTab === 'UPI' ? 'text-white' : 'text-slate-300'
               }`}
             >
-              3. UPI ID / VPA Check
+              3. UPI VPA
             </h4>
             <p className="text-[11px] text-slate-400 mt-0.5">
-              Detect fake support & deceptive handles
+              UPI VPAs & Handles
             </p>
           </div>
         </button>
@@ -249,14 +249,10 @@ export const ScamShieldPage: React.FC = () => {
         <form onSubmit={handleInspect} className="space-y-4">
           <div className="flex items-center justify-between">
             <label className="text-xs font-semibold uppercase tracking-wider text-slate-300">
-              {activeTab === 'MESSAGE'
-                ? 'Paste SMS, Email or Chat Text'
-                : activeTab === 'URL'
-                ? 'Enter Suspicious Website Link'
-                : 'Enter Virtual Payment Address (e.g. handle@bank)'}
+              {t('scamshield.inputLabel')}
             </label>
             <span className="text-[11px] font-mono text-cyan-400">
-              Zod Validated & SSRF Guarded
+              {t('common.mainnetGuardActive')}
             </span>
           </div>
 
@@ -265,7 +261,7 @@ export const ScamShieldPage: React.FC = () => {
               rows={3}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder="e.g. URGENT: Your bank account will be deactivated today due to incomplete KYC. Update at http://..."
+              placeholder={t('scamshield.inputPlaceholder')}
               className="w-full p-4 bg-slate-900 border border-slate-800 rounded-2xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
             />
           ) : (
@@ -292,7 +288,7 @@ export const ScamShieldPage: React.FC = () => {
           <div className="flex items-center justify-between pt-1">
             <p className="text-[11px] text-slate-400 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Real heuristic rule engine running live on Neon PostgreSQL.</span>
+              <span>{t('common.liveNeonPostgres')}</span>
             </p>
 
             <button
@@ -300,7 +296,7 @@ export const ScamShieldPage: React.FC = () => {
               disabled={isInspecting}
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-md shadow-cyan-500/20 disabled:opacity-50 transition-all cursor-pointer"
             >
-              {isInspecting ? 'Running Inspection...' : 'Inspect with ScamShield'}
+              {isInspecting ? t('scamshield.analyzing') : t('scamshield.analyzeBtn')}
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -308,20 +304,20 @@ export const ScamShieldPage: React.FC = () => {
       </div>
 
       {/* Risk Analysis Result */}
-      {scanResult && (
+      {scanResult ? (
         <div className="bg-[#0c1322] border border-slate-800 rounded-3xl p-6 shadow-xl space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-800/80 gap-3">
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
-                  Audit ID: {scanResult.analysisId.slice(0, 8)}...
+                  ID: {scanResult.analysisId.slice(0, 8)}...
                 </span>
                 <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 font-mono text-cyan-300">
                   {scanResult.category}
                 </span>
               </div>
               <h3 className="text-lg font-bold text-white mt-1">
-                Explainable Risk Assessment Report
+                {t('scamshield.title')}
               </h3>
             </div>
             <div className="flex items-center gap-3">
@@ -338,7 +334,7 @@ export const ScamShieldPage: React.FC = () => {
                     : 'bg-teal-950/80 text-teal-300 border-teal-800'
                 }`}
               >
-                {scanResult.riskLevel} RISK ({scanResult.riskScore}/100)
+                {getLocalizedRiskBadge(scanResult.riskLevel)} ({t('scamshield.riskScoreLabel', { score: scanResult.riskScore })})
               </span>
             </div>
           </div>
@@ -347,30 +343,30 @@ export const ScamShieldPage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3">
               <span className="text-[10px] font-mono uppercase text-slate-500 block mb-1">
-                Extracted UPI ID
+                UPI ID
               </span>
               <p className="text-xs font-mono font-semibold text-cyan-300 truncate">
-                {scanResult.extractedUpiId || 'None detected'}
+                {scanResult.extractedUpiId || '-'}
               </p>
             </div>
             <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3">
               <span className="text-[10px] font-mono uppercase text-slate-500 block mb-1">
-                Extracted Amount
+                {t('common.amount')}
               </span>
               <p className="text-xs font-mono font-semibold text-teal-300">
                 {scanResult.extractedAmount !== null
-                  ? `₹${scanResult.extractedAmount.toLocaleString()}`
-                  : 'None detected'}
+                  ? formatCurrency(scanResult.extractedAmount)
+                  : '-'}
               </p>
             </div>
             <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3">
               <span className="text-[10px] font-mono uppercase text-slate-500 block mb-1">
-                Extracted URLs
+                URL Links
               </span>
               <p className="text-xs font-mono font-semibold text-cyan-300 truncate">
                 {scanResult.extractedUrls.length > 0
                   ? scanResult.extractedUrls.join(', ')
-                  : 'None detected'}
+                  : '-'}
               </p>
             </div>
           </div>
@@ -378,7 +374,7 @@ export const ScamShieldPage: React.FC = () => {
           {/* Explainable Reasons */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">
-              Explainable Risk Indicators:
+              {t('scamshield.indicatorsTitle')}
             </h4>
             <div className="space-y-2">
               {scanResult.reasons.map((reason, idx) => (
@@ -404,7 +400,7 @@ export const ScamShieldPage: React.FC = () => {
           {/* Recommended Action */}
           <div className="p-4 rounded-2xl bg-cyan-950/20 border border-cyan-800/40">
             <h4 className="text-xs font-bold text-cyan-300 mb-2 flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-teal-400" /> Protective Recommendations:
+              <CheckCircle2 className="w-4 h-4 text-teal-400" /> {t('scamshield.recommendationTitle')}
             </h4>
             <ul className="space-y-1.5 text-xs text-slate-300">
               {scanResult.recommendations.map((rec, idx) => (
@@ -420,7 +416,7 @@ export const ScamShieldPage: React.FC = () => {
           <div className="pt-3 border-t border-slate-800/80 space-y-3">
             <div className="flex items-center justify-between text-xs font-mono">
               <span className="text-slate-400 flex items-center gap-1.5">
-                <Receipt className="w-4 h-4 text-cyan-400" /> Personal Ledger Cross-Check:
+                <Receipt className="w-4 h-4 text-cyan-400" /> {t('scamshield.transactionLinkingTitle')}:
               </span>
               <span
                 className={`font-semibold ${
@@ -430,16 +426,13 @@ export const ScamShieldPage: React.FC = () => {
                 }`}
               >
                 {scanResult.matchedTransactions.length > 0
-                  ? `⚠️ ${scanResult.matchedTransactions.length} MATCHING TRANSACTION(S) FOUND`
-                  : 'No matching transactions in your ledger'}
+                  ? `⚠️ ${scanResult.matchedTransactions.length} ${t('common.warning')}`
+                  : t('scamshield.noMatchedTransaction')}
               </span>
             </div>
 
             {scanResult.matchedTransactions.length > 0 && (
               <div className="bg-slate-900/80 border border-amber-800/50 rounded-2xl p-4 space-y-2">
-                <p className="text-xs text-amber-300 font-medium">
-                  We found transactions in your personal financial records matching the analyzed entity or amount:
-                </p>
                 <div className="space-y-2 mt-2">
                   {scanResult.matchedTransactions.map((tx) => (
                     <div
@@ -453,7 +446,7 @@ export const ScamShieldPage: React.FC = () => {
                         <div className="text-[11px] text-slate-400 flex items-center gap-2 mt-0.5">
                           <span>{tx.category}</span>
                           <span>•</span>
-                          <span>{new Date(tx.transactionDate).toLocaleDateString()}</span>
+                          <span>{formatDate(tx.transactionDate)}</span>
                         </div>
                       </div>
                       <div className="text-right">
@@ -462,7 +455,7 @@ export const ScamShieldPage: React.FC = () => {
                             tx.type === 'EXPENSE' ? 'text-rose-400' : 'text-teal-400'
                           }`}
                         >
-                          {tx.type === 'EXPENSE' ? '-' : '+'}₹{tx.amount.toLocaleString()}
+                          {tx.type === 'EXPENSE' ? '-' : '+'}{formatCurrency(tx.amount)}
                         </span>
                       </div>
                     </div>
@@ -471,6 +464,10 @@ export const ScamShieldPage: React.FC = () => {
               </div>
             )}
           </div>
+        </div>
+      ) : (
+        <div className="p-8 text-center text-slate-500 text-xs bg-[#0c1322] border border-slate-800 rounded-3xl">
+          {t('scamshield.emptyStateTitle')}
         </div>
       )}
     </div>

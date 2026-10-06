@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import type { UserProfile, UserRole } from '../types';
 import { Badge } from '../components/Badge';
+import { useI18n } from '../i18n';
 
 interface ProfilePageProps {
   user: UserProfile;
@@ -21,6 +22,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   onUpdateRole,
   onLogout,
 }) => {
+  const { t } = useI18n();
   const [name, setName] = useState(user.name);
   const [isSaved, setIsSaved] = useState(false);
 
@@ -42,9 +44,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <Badge variant={user.role === 'ADMIN' ? 'teal' : 'cyan'}>
-                  Role: {user.role}
+                  {t('profile.roleLabel')}: {user.role}
                 </Badge>
-                <Badge variant="teal">ID: Team 50</Badge>
+                <Badge variant="teal">{t('common.subtitle')}</Badge>
               </div>
               <h2 className="text-2xl font-bold text-white tracking-tight">
                 {user.name}
@@ -57,9 +59,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
           <button
             onClick={onLogout}
-            className="px-4 py-2 rounded-xl bg-slate-900 border border-rose-900/60 hover:border-rose-500 text-rose-300 text-xs font-semibold flex items-center gap-2 transition-colors"
+            className="px-4 py-2 rounded-xl bg-slate-900 border border-rose-900/60 hover:border-rose-500 text-rose-300 text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer"
           >
-            <LogOut className="w-4 h-4" /> Sign Out
+            <LogOut className="w-4 h-4" /> {t('profile.logoutBtn')}
           </button>
         </div>
       </div>
@@ -68,7 +70,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       {isSaved && (
         <div className="p-3.5 rounded-2xl bg-teal-950/40 border border-teal-800/60 flex items-center gap-2 text-xs text-teal-300">
           <CheckCircle2 className="w-4 h-4 text-teal-400" />
-          <span>Profile preferences saved successfully (Client State).</span>
+          <span>{t('common.success')}</span>
         </div>
       )}
 
@@ -77,16 +79,16 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         {/* Personal Details */}
         <div className="bg-[#0c1322] border border-slate-800 rounded-3xl p-6">
           <h3 className="text-base font-bold text-white mb-1 flex items-center gap-2">
-            <User className="w-4 h-4 text-cyan-400" /> Account Identity
+            <User className="w-4 h-4 text-cyan-400" /> {t('profile.accountDetails')}
           </h3>
           <p className="text-xs text-slate-400 mb-5">
-            Personal profile details scoped to your tenant ledger
+            {t('profile.subtitle')}
           </p>
 
           <form onSubmit={handleSave} className="space-y-4">
             <div>
               <label className="block text-xs font-medium text-slate-300 mb-1">
-                Full Display Name
+                {t('profile.nameLabel')}
               </label>
               <input
                 type="text"
@@ -98,7 +100,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
             <div>
               <label className="block text-xs font-medium text-slate-300 mb-1">
-                Email Address (Immutable)
+                {t('profile.emailLabel')}
               </label>
               <input
                 type="email"
@@ -113,7 +115,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 type="submit"
                 className="px-5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 text-slate-950 font-bold text-xs shadow-md shadow-cyan-500/20"
               >
-                Update Profile
+                {t('common.save')}
               </button>
             </div>
           </form>
@@ -123,22 +125,22 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         <div className="bg-[#0c1322] border border-slate-800 rounded-3xl p-6 flex flex-col justify-between">
           <div>
             <h3 className="text-base font-bold text-white mb-1 flex items-center gap-2">
-              <Users className="w-4 h-4 text-teal-400" /> Role-Based Access Control (RBAC)
+              <Users className="w-4 h-4 text-teal-400" /> {t('profile.rbacSimulatorTitle')}
             </h3>
             <p className="text-xs text-slate-400 mb-4">
-              Test and toggle your active role to verify permissions
+              {t('profile.rbacSimulatorDesc')}
             </p>
 
             <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-3">
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-xs font-bold text-slate-200">
-                    Current Active Role:
+                    {t('profile.roleLabel')}:
                   </span>
                   <p className="text-[11px] text-slate-400 mt-0.5">
                     {user.role === 'ADMIN'
-                      ? 'Elevated privilege: Can access platform telemetry and system audit logs.'
-                      : 'Standard privilege: Confined strictly to own financial ledger.'}
+                      ? 'ADMIN'
+                      : 'USER'}
                   </p>
                 </div>
                 <span className="text-xs font-mono font-bold text-cyan-400 px-2 py-1 bg-cyan-950/80 rounded border border-cyan-800">
@@ -156,7 +158,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                       : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  Set as USER
+                  {t('profile.standardUserBtn')}
                 </button>
                 <button
                   type="button"
@@ -167,7 +169,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                       : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  Set as ADMIN
+                  {t('profile.adminUserBtn')}
                 </button>
               </div>
             </div>
@@ -175,7 +177,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
           <div className="mt-4 pt-3 border-t border-slate-800 text-[11px] font-mono text-slate-500 flex items-center gap-2">
             <ShieldCheck className="w-4 h-4 text-teal-400" />
-            <span>Server verifies RBAC via JWT claims on every endpoint</span>
+            <span>{t('security.pillar2Desc')}</span>
           </div>
         </div>
       </div>

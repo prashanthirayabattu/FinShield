@@ -9,6 +9,8 @@ import {
   ChevronRight,
   Sparkles,
 } from 'lucide-react';
+import { useI18n } from '../i18n';
+import { LanguageSelector } from '../components/LanguageSelector';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -19,6 +21,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onGetStarted,
   onLogin,
 }) => {
+  const { t } = useI18n();
+
   return (
     <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200">
       {/* Top Navbar */}
@@ -32,23 +36,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               Fin<span className="text-cyan-400">Shield</span>
             </span>
             <span className="hidden sm:inline-block ml-2 text-xs font-mono text-slate-400 border border-slate-800 px-2 py-0.5 rounded-full">
-              PS-01 • Team 50
+              PS-01 • {t('common.subtitle')}
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <LanguageSelector variant="compact" />
           <button
             onClick={onLogin}
             className="text-sm font-semibold text-slate-300 hover:text-cyan-400 transition-colors px-3 py-2"
           >
-            Login
+            {t('landing.login')}
           </button>
           <button
             onClick={onGetStarted}
             className="inline-flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 text-sm font-bold px-4 py-2 rounded-xl shadow-lg shadow-cyan-500/20 transition-all duration-200 hover:scale-105"
           >
-            Get Started
+            {t('landing.getStarted')}
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -63,20 +68,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         {/* Security badge pill */}
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-950/60 border border-cyan-800/60 text-cyan-300 text-xs font-mono mb-8 animate-pulse">
           <Shield className="w-3.5 h-3.5 text-cyan-400" />
-          BUILD SECURE 24 • ACTIVE DEFENSE PERSONAL FINANCE
+          {t('landing.heroBadge')}
         </div>
 
         {/* Hero Title */}
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white max-w-4xl leading-tight">
-          Your Money.{' '}
+          {t('landing.heroTitlePrefix')}{' '}
           <span className="bg-gradient-to-r from-cyan-400 via-teal-300 to-cyan-200 bg-clip-text text-transparent">
-            Secured Intelligently.
+            {t('landing.heroTitleHighlight')}
           </span>
         </h1>
 
         {/* Supporting text */}
         <p className="mt-6 text-lg sm:text-xl text-slate-400 max-w-2xl leading-relaxed">
-          Manage, understand and protect your finances with AI-powered financial security.
+          {t('landing.heroSubtitle')}
         </p>
 
         {/* CTA Buttons */}
@@ -85,28 +90,28 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             onClick={onGetStarted}
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 text-slate-950 font-bold text-base shadow-xl shadow-cyan-500/25 hover:from-cyan-400 hover:to-teal-400 transition-all duration-200 hover:-translate-y-0.5"
           >
-            Get Started <ChevronRight className="w-5 h-5" />
+            {t('landing.getStarted')} <ChevronRight className="w-5 h-5" />
           </button>
           <button
             onClick={onLogin}
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-slate-900 border border-slate-700/80 hover:border-cyan-500/60 text-slate-200 font-semibold text-base hover:bg-slate-800/80 transition-all duration-200"
           >
-            Login
+            {t('landing.login')}
           </button>
         </div>
 
         {/* Quick architecture banner */}
-        <div className="mt-14 inline-flex items-center gap-6 px-6 py-3 rounded-2xl bg-[#0c1322] border border-slate-800 text-xs font-mono text-slate-400">
+        <div className="mt-14 inline-flex flex-wrap items-center justify-center gap-4 sm:gap-6 px-6 py-3 rounded-2xl bg-[#0c1322] border border-slate-800 text-xs font-mono text-slate-400">
           <span className="flex items-center gap-2">
-            <Lock className="w-4 h-4 text-cyan-400" /> Zero Plaintext Storage
+            <Lock className="w-4 h-4 text-cyan-400" /> {t('landing.zeroPlaintextStorage')}
           </span>
           <span className="hidden sm:inline text-slate-700">•</span>
-          <span className="hidden sm:flex items-center gap-2">
-            <ShieldAlert className="w-4 h-4 text-teal-400" /> Integrated ScamShield Heuristics
+          <span className="flex items-center gap-2">
+            <ShieldAlert className="w-4 h-4 text-teal-400" /> {t('landing.integratedScamShield')}
           </span>
           <span className="hidden md:inline text-slate-700">•</span>
-          <span className="hidden md:flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-cyan-400" /> Server-Side AI Guardrails
+          <span className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-cyan-400" /> {t('landing.serverSideAiGuardrails')}
           </span>
         </div>
       </section>
@@ -119,9 +124,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className="w-12 h-12 rounded-xl bg-cyan-950/60 border border-cyan-800/60 flex items-center justify-center text-cyan-400 mb-5 group-hover:scale-110 transition-transform">
               <Wallet className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Manage Finances</h3>
+            <h3 className="text-xl font-bold text-white mb-2">{t('landing.card1Title')}</h3>
             <p className="text-sm text-slate-400 leading-relaxed">
-              Track income and expenses across granular categories with real-time budget thresholds, instant search, and sanitized CSV exports.
+              {t('landing.card1Desc')}
             </p>
           </div>
 
@@ -130,9 +135,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className="w-12 h-12 rounded-xl bg-teal-950/60 border border-teal-800/60 flex items-center justify-center text-teal-400 mb-5 group-hover:scale-110 transition-transform">
               <TrendingUp className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Understand Spending</h3>
+            <h3 className="text-xl font-bold text-white mb-2">{t('landing.card2Title')}</h3>
             <p className="text-sm text-slate-400 leading-relaxed">
-              Interactive category breakdowns, monthly cash-flow summaries, and context-aware AI assistant analysis that never exposes private API keys.
+              {t('landing.card2Desc')}
             </p>
           </div>
 
@@ -141,9 +146,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className="w-12 h-12 rounded-xl bg-cyan-950/60 border border-cyan-800/60 flex items-center justify-center text-cyan-400 mb-5 group-hover:scale-110 transition-transform">
               <ShieldAlert className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Protect Money</h3>
+            <h3 className="text-xl font-bold text-white mb-2">{t('landing.card3Title')}</h3>
             <p className="text-sm text-slate-400 leading-relaxed">
-              Built-in ScamShield inspection scans suspicious payment messages, phishing URLs, and fraudulent UPI IDs, directly linking scam alerts to your ledger.
+              {t('landing.card3Desc')}
             </p>
           </div>
         </div>
@@ -152,10 +157,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* Footer */}
       <footer className="mt-auto border-t border-slate-800/80 bg-[#090e1a] px-6 lg:px-12 py-8 text-center text-xs text-slate-500 font-mono">
         <p>
-          FinShield • Team 50 (Tech Tribe) • Build Secure 24 Hrs Hackathon — Abhedya (VBIT Cybersecurity Forum)
+          {t('common.copyright')}
         </p>
         <p className="mt-1 text-slate-600">
-          Authored Live During Hackathon Window • Live Origin Validation
+          {t('common.liveWindowBadge')}
         </p>
       </footer>
     </div>

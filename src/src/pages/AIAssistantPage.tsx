@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '../components/Badge';
 import { aiApi, type AiAssistantResponse } from '../services/aiApi';
+import { useI18n } from '../i18n';
 
 interface ChatMessage {
   id: string;
@@ -23,6 +24,7 @@ interface ChatMessage {
 }
 
 export const AIAssistantPage: React.FC = () => {
+  const { t, language, getLocalizedError } = useI18n();
   const messageIdCounter = useRef(100);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -30,7 +32,7 @@ export const AIAssistantPage: React.FC = () => {
     {
       id: 'msg_01',
       sender: 'assistant',
-      text: 'Hello! I am your FinShield Secure AI Financial Advisor. I analyze your securely scoped financial data to answer questions about your spending, budgets, and savings. You can ask me about your expenses, specific categories, budget limits, or recent transactions.',
+      text: '',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
@@ -39,12 +41,11 @@ export const AIAssistantPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const exampleQuestions = [
-    'How much did I spend this month?',
-    'What is my highest spending category?',
-    'Am I close to exceeding any budget?',
-    'How much income did I receive this month?',
-    'What were my recent expenses?',
-    'Explain my latest scam alert',
+    t('ai.ex1'),
+    t('ai.ex2'),
+    t('ai.ex3'),
+    t('ai.ex4'),
+    t('ai.ex5'),
   ];
 
   const scrollToBottom = () => {
@@ -76,7 +77,7 @@ export const AIAssistantPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await aiApi.ask(trimmed);
+      const response = await aiApi.ask(trimmed, language);
       messageIdCounter.current += 1;
       const asstMsgId = `asst_${messageIdCounter.current}`;
 
@@ -90,8 +91,8 @@ export const AIAssistantPage: React.FC = () => {
 
       setMessages((prev) => [...prev, assistantMsg]);
     } catch (err: unknown) {
-      const errMsg = err instanceof Error ? err.message : 'Failed to retrieve AI analysis';
-      setError(errMsg);
+      const errMsg = err instanceof Error ? err.message : t('ai.errorFailed');
+      setError(getLocalizedError(errMsg));
     } finally {
       setIsLoading(false);
     }
@@ -103,27 +104,27 @@ export const AIAssistantPage: React.FC = () => {
       <div className="bg-gradient-to-r from-[#0a1424] via-[#091522] to-[#070e1c] border border-cyan-800/40 rounded-3xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <Badge variant="cyan">Tenant Isolated</Badge>
-            <Badge variant="teal">Neon PostgreSQL Backed</Badge>
+            <Badge variant="cyan">{t('nav.protectedBadge')}</Badge>
+            <Badge variant="teal">{t('common.liveNeonPostgres')}</Badge>
           </div>
           <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-            <Bot className="w-6 h-6 text-teal-400" /> FinShield AI Financial Advisor
+            <Bot className="w-6 h-6 text-teal-400" /> {t('ai.title')}
           </h2>
           <p className="text-xs text-slate-400 mt-1 max-w-xl">
-            Conversational analysis scoped strictly to your authenticated ledger records. Secrets and database credentials remain 100% server-side.
+            {t('ai.subtitle')}
           </p>
         </div>
 
         <div className="p-3 rounded-2xl bg-cyan-950/30 border border-cyan-800/50 flex items-center gap-2.5 text-xs font-mono text-cyan-300">
           <Lock className="w-4 h-4 text-cyan-400 shrink-0" />
-          <span>Server-Scoped Tool Broker Architecture</span>
+          <span>{t('common.mainnetGuardActive')}</span>
         </div>
       </div>
 
       {/* Suggested Questions Pills */}
       <div>
         <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2.5 flex items-center gap-1.5">
-          <Sparkles className="w-3.5 h-3.5 text-cyan-400" /> Quick Inquiries:
+          <Sparkles className="w-3.5 h-3.5 text-cyan-400" /> {t('ai.examplePromptsTitle')}
         </p>
         <div className="flex flex-wrap gap-2">
           {exampleQuestions.map((q, idx) => (
@@ -181,20 +182,22 @@ export const AIAssistantPage: React.FC = () => {
                     : 'bg-slate-900/90 text-slate-200 border border-slate-800 rounded-tl-none'
                 }`}
               >
-                <div className="whitespace-pre-line">{m.text}</div>
+                <div className="whitespace-pre-line">
+                  {m.id === 'msg_01' ? t('ai.greeting') : m.text}
+                </div>
 
                 {/* Structured Metadata Badge (if available) */}
                 {m.dataUsed && m.dataUsed.period && (
                   <div className="pt-2 mt-2 border-t border-slate-800/80 flex flex-wrap items-center gap-2 text-[10px] font-mono text-slate-400">
                     <span className="flex items-center gap-1 text-cyan-400">
-                      <Database className="w-3 h-3" /> {m.dataUsed.period}
+                      <Database className="w-3 h-3" /> {t('ai.dataUsedPeriod', { period: m.dataUsed.period })}
                     </span>
                     <span>•</span>
                     <span className="flex items-center gap-1 text-teal-400">
-                      <Layers className="w-3 h-3" /> {m.dataUsed.transactionCount} txs analyzed
+                      <Layers className="w-3 h-3" /> {t('ai.dataUsedTxCount', { count: m.dataUsed.transactionCount })}
                     </span>
                     <span>•</span>
-                    <span className="text-slate-500">Provider: {m.dataUsed.provider}</span>
+                    <span className="text-slate-500">{t('ai.providerTag', { provider: m.dataUsed.provider })}</span>
                   </div>
                 )}
 
@@ -212,7 +215,7 @@ export const AIAssistantPage: React.FC = () => {
               </div>
               <div className="bg-slate-900/90 text-slate-300 border border-slate-800 rounded-2xl rounded-tl-none p-4 text-xs flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                <span>Analyzing your securely scoped financial data...</span>
+                <span>{t('ai.analyzingProgress')}</span>
               </div>
             </div>
           )}
@@ -234,14 +237,14 @@ export const AIAssistantPage: React.FC = () => {
               value={inputMessage}
               disabled={isLoading}
               onChange={(e) => setInputMessage(e.target.value)}
-              placeholder="Ask questions about your spending, budget limits, or savings..."
+              placeholder={t('ai.inputPlaceholder')}
               className="flex-1 px-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 disabled:opacity-50"
             />
             <button
               type="submit"
               disabled={isLoading || !inputMessage.trim()}
               className="p-3 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 rounded-xl font-bold shadow-md shadow-cyan-500/20 transition-all hover:scale-105 disabled:opacity-50 cursor-pointer"
-              aria-label="Send message"
+              aria-label={t('ai.sendBtn')}
             >
               <Send className="w-4 h-4" />
             </button>
@@ -250,7 +253,7 @@ export const AIAssistantPage: React.FC = () => {
           <div className="mt-2 text-center text-[11px] text-slate-500 flex items-center justify-center gap-1.5">
             <ShieldCheck className="w-3.5 h-3.5 text-teal-400" />
             <span>
-              Analyzes your securely scoped financial records via verified backend controls; zero credential leaks.
+              {t('ai.securityNotice')}
             </span>
           </div>
         </div>
