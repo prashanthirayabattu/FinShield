@@ -43,6 +43,13 @@ const isRealDbConfigured = Boolean(process.env.DATABASE_URL && process.env.DATAB
 
 if (!process.env.DATABASE_URL) {
   process.env.DATABASE_URL = 'postgresql://postgres:postgres@localhost:5432/finshield?schema=public';
+} else if (process.env.DATABASE_URL.includes('neon.tech')) {
+  if (!process.env.DATABASE_URL.includes('connect_timeout')) {
+    process.env.DATABASE_URL += (process.env.DATABASE_URL.includes('?') ? '&' : '?') + 'connect_timeout=30';
+  }
+  if (!process.env.DATABASE_URL.includes('pool_timeout')) {
+    process.env.DATABASE_URL += (process.env.DATABASE_URL.includes('?') ? '&' : '?') + 'pool_timeout=30';
+  }
 }
 
 const getEnv = (): ServerEnv => {

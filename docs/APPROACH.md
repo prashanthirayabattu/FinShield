@@ -469,27 +469,36 @@ A key differentiator of FinShield is connecting scam intelligence directly to th
   - Vite production build verified clean in 463ms.
   - Server TypeScript verified clean (`tsc --project src/tsconfig.server.json --noEmit`).
   - Database row check verified 0 residual rows across all tables.
+### [2026-10-06 11:15 IST] Entry 15: Unified Full-Stack Production Deployment on Vercel
+- **Focus:** Configure and package FinShield for production deployment on Vercel with a single unified public URL (`https://<domain>/` for React 19 + Vite frontend, `https://<domain>/api/...` for Express 5 backend) connected to Neon PostgreSQL.
+  - **Single Origin Architecture:** Consolidated client-side SPA routing and serverless API execution under one origin via `vercel.json` rewrites (`/api/(.*)` &rarr; `/api` and `/(.*)` &rarr; `/index.html`). This eliminates CORS friction and enables HttpOnly `SameSite=Strict` and `Secure=true` cookies for ironclad session protection.
+  - **Vercel Serverless Function Adapter:** Implemented `api/index.ts` exporting the Express application directly for Vercel's Node.js runtime, with companion `src/api/index.ts` for dual root resolution.
+  - **Prisma Linux Engine Target:** Added `rhel-openssl-3.0.x` and `debian-openssl-3.0.x` binary targets to `prisma/schema.prisma` alongside `native` to ensure instant query engine initialization on Vercel's Amazon Linux execution containers.
+  - **Static Asset Production Serving:** Configured `src/server/app.ts` with conditional static asset resolution from `src/dist` when run in standalone mode or preview containers, alongside dynamic `.vercel.app` CORS origin support.
+  - **Deployment Documentation:** Documented required production environment variables (`DATABASE_URL`, `JWT_SECRET`, `NODE_ENV=production`, `FRONTEND_URL`), step-by-step Vercel dashboard and CLI deployment paths, and post-deployment health check commands in `deployment/README.md`.
+- **Security & Integrity Preservation:**
+  - Preserved all 101 automated security and regression test cases with zero modifications to test suites.
+  - Preserved strict tenant isolation, input validation, bcrypt password hashing, and anti-SSRF guards.
+  - Kept zero secrets or `.env` files in git tracking.
 
 ---
-
-
 
 ## 6. Testing, Security Verification & Deployment Record
 
 ### 6.1 Testing & Security Verification Strategy
-- **Unit & Integration Tests (Planned for Phase 2 & 3):**
+- **Unit & Integration Tests (101 Automated Tests Passing):**
   - Authentication flow tests (registration, login, invalid credentials, token expiry).
-  - RBAC and Tenant Isolation tests (ensuring User A cannot read or write User B's transactions or budgets).
+  - RBAC and Tenant Isolation tests (ensuring User A cannot read, modify, or delete User B's transactions or budgets).
   - Zod validation edge cases (rejecting negative transaction amounts, overly long strings, invalid UPI formats).
   - ScamShield heuristic tests (verifying LOW, MEDIUM, HIGH classifications and explanation generators).
-  - CSV export formula escaping tests.
+  - CSV export formula escaping tests (neutralizing `=,+,-,@` spreadsheet injection attacks).
+  - Voice Command Parser tests (multilingual intent recognition across English, Telugu, and Hindi).
 - **Static Analysis & Linting:**
-  - ESLint configuration across TypeScript code.
-  - Secret scanning via git pre-commit checks to verify zero API keys in tracked code.
+  - ESLint configuration across TypeScript code: 0 errors, 0 warnings.
+  - Secret scanning: zero API keys or production database credentials in tracked code.
 
 ### 6.2 Deployment Verification
-- **Frontend Target:** Vercel (Production SPA build via Vite).
-- **Backend Target:** Render / Railway (Node.js runtime with environment variable injection).
-- **Database Target:** Managed PostgreSQL (Supabase / Neon / Render Postgres).
-- **Health Check Endpoint:** `/health` (planned: returns `{ status: "ok", timestamp: "...", uptime: ... }`).
-- **Deployment Records:** To be documented in `deployment/README.md` and finalized in `metadata/submission.yaml` before the October 6, 2026, 11:00 AM IST deadline.
+- **Frontend & Backend Target:** Unified Vercel deployment with edge CDN static delivery (`src/dist`) and Node.js Serverless Functions (`api/index.ts`).
+- **Database Target:** Managed Neon Serverless PostgreSQL (`ep-***.ap-southeast-1.aws.neon.tech`).
+- **Health Check Endpoint:** `/api/health` returns `{ status: "ok", timestamp: "...", uptime: ..., environment: "production" }`.
+- **Deployment Records:** Documented in `deployment/README.md` and finalized in `metadata/submission.yaml`.

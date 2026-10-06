@@ -17,13 +17,18 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 /**
- * Checks connectivity to the database.
+ * Checks connectivity to the database with resilient retries for serverless cold starts.
  */
 export async function checkDatabaseConnection(): Promise<boolean> {
-  try {
-    await prisma.$queryRaw`SELECT 1`;
-    return true;
-  } catch {
-    return false;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      return true;
+    } catch {
+      if (attempt < 3) {
+        await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
+      }
+    }
   }
+  return false;
 }

@@ -18,7 +18,12 @@
     "test:sec": "tsx --test server/tests/securityAudit.test.ts",
     "test:i18n": "tsx --test server/tests/i18nCompleteness.test.ts",
     "test:voice": "tsx --test server/tests/voiceCommand.test.ts",
-    "db:check": "tsx server/scripts/checkDb.ts"
+    "db:check": "tsx server/scripts/checkDb.ts",
+    "start": "tsx server/server.ts",
+    "postinstall": "prisma generate"
+  },
+  "prisma": {
+    "schema": "prisma/schema.prisma"
   },
   "dependencies": {
     "@prisma/client": "^6.4.1",
