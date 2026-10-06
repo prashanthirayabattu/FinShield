@@ -5904,3 +5904,63 @@ Actions Taken:
 * Validated ESLint: 0 errors
 * Validated Vite build: completed in 994ms with 0 errors
 
+
+================================================================================
+[2026-10-06T14:06:28+05:30] fix: repair Vercel API routing and production auth
+================================================================================
+User Prompt (verbatim):
+(Session resumed from context summary — continuing fix for Vercel production deployment where login/register API calls fail due to broken routing in vercel.json)
+
+Agent Response:
+ROOT CAUSE IDENTIFIED AND FIXED:
+
+vercel.json had a broken rewrite:
+  { "source": "/api/(.*)", "destination": "/api" }
+
+This collapsed ALL /api/* paths to just /api — so POST /api/auth/login arrived at Express as /api (no sub-path), and Express's subrouter couldn't match /auth/login.
+
+FIXES APPLIED:
+1. Created api/[...path].ts (Vercel catch-all serverless function) — replaces api/index.ts.
+   Vercel's file-based routing automatically maps /api/auth/login -> api/[...path].ts
+   preserving the full request path. Import uses .js extension for ESM compatibility.
+
+2. Deleted api/index.ts (the non-catch-all function that only matched exactly /api).
+
+3. Fixed vercel.json — removed the broken /api/(.*) -> /api rewrite entirely.
+   Only the SPA fallback rewrite /(.*) -> /index.html remains.
+
+4. Frontend build passes locally (✓ 1934 modules, dist built in 539ms).
+
+5. Updated metadata/submission.yaml with final commit SHA and deployment URL.
+
+Commit SHA: 31c1013c5ada6502f0466c5d79b9f80e087bb389
+Pushed to: https://github.com/prashanthirayabattu/FinShield.git (main)
+Deployment URL: https://fin-shield-bxelbxhy5-prashuu181-7640.vercel.app/
+
+Agent Response Summary:
+Identified and fixed the root cause of Vercel login/register failure: vercel.json was rewriting all /api/* paths to /api, stripping sub-paths so Express couldn't route to auth subroutes. Fixed by replacing api/index.ts with api/[...path].ts (Vercel catch-all) and removing the broken rewrite from vercel.json. Frontend build confirmed passing. Changes committed (31c1013) and pushed to main.
+
+Commit SHA:
+31c1013c5ada6502f0466c5d79b9f80e087bb389
+
+Files Modified / Created:
+* api/[...path].ts (Created)
+* api/index.ts (Deleted)
+* vercel.json (Modified)
+* tsconfig.json (Created)
+* metadata/submission.yaml (Modified)
+* docs/logs.txt (Modified)
+
+Actions Taken:
+* Read vercel.json — identified broken /api/(.*) -> /api rewrite
+* Read api/index.ts — confirmed entry point content
+* Read src/server/app.ts — confirmed Express mounts at /api
+* Created api/[...path].ts with catch-all Vercel routing pattern
+* Deleted api/index.ts
+* Rewrote vercel.json removing broken API rewrite
+* Ran: npm.cmd --prefix src run build (exit 0, ✓ built in 539ms)
+* Ran: git add -A
+* Ran: git commit -m "fix: repair Vercel API routing and production auth"
+* Ran: git push origin main
+* Updated metadata/submission.yaml with commit SHA and deployment URL
+
