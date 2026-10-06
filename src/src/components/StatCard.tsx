@@ -21,10 +21,10 @@ export const StatCard: React.FC<StatCardProps> = ({
   accent = 'cyan',
 }) => {
   const accentGlow = {
-    cyan: 'border-slate-800/80 hover:border-cyan-500/50 shadow-cyan-950/20',
-    teal: 'border-slate-800/80 hover:border-teal-500/50 shadow-teal-950/20',
-    red: 'border-slate-800/80 hover:border-red-500/50 shadow-red-950/20',
-    purple: 'border-slate-800/80 hover:border-purple-500/50 shadow-purple-950/20',
+    cyan: 'border-slate-800/80 hover:border-cyan-500/50 hover:shadow-cyan-500/10',
+    teal: 'border-slate-800/80 hover:border-teal-500/50 hover:shadow-teal-500/10',
+    red: 'border-slate-800/80 hover:border-red-500/50 hover:shadow-red-500/10',
+    purple: 'border-slate-800/80 hover:border-purple-500/50 hover:shadow-purple-500/10',
   };
 
   const iconAccent = {
@@ -36,7 +36,7 @@ export const StatCard: React.FC<StatCardProps> = ({
 
   return (
     <div
-      className={`relative bg-[#0c1322] border rounded-2xl p-5 transition-all duration-300 hover:shadow-lg ${accentGlow[accent]}`}
+      className={`relative bg-[#090f1d]/75 backdrop-blur-md border rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${accentGlow[accent]}`}
     >
       <div className="flex items-center justify-between">
         <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
@@ -71,3 +71,4 @@ export const StatCard: React.FC<StatCardProps> = ({
     </div>
   );
 };
+

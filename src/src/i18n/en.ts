@@ -3,7 +3,7 @@ import type { TranslationDictionary } from './types';
 export const en: TranslationDictionary = {
   common: {
     brand: 'FinShield',
-    subtitle: 'Team 50 • Tech Tribe',
+    subtitle: 'Secure Financial Intelligence',
     loading: 'Loading...',
     saving: 'Saving...',
     cancel: 'Cancel',
@@ -39,7 +39,7 @@ export const en: TranslationDictionary = {
     liveNeonPostgres: 'Neon PostgreSQL Live',
     mainnetGuardActive: 'Mainnet Guard Active',
     buildSecureTrack: 'Build Secure 24 — Official Track PS-01',
-    copyright: 'FinShield • Team 50 (Tech Tribe) • Build Secure 24 Hrs Hackathon — Abhedya (VBIT Cybersecurity Forum)',
+    copyright: 'FinShield • Secure Financial Intelligence • Build Secure',
     liveWindowBadge: 'Authored Live During Hackathon Window • Live Origin Validation',
     currency: '₹',
   },

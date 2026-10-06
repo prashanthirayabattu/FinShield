@@ -93,7 +93,7 @@ export const SecurityPage: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Security Header Banner */}
-      <div className="bg-gradient-to-r from-[#0c1626] via-[#091522] to-[#070e1c] border border-cyan-800/40 rounded-3xl p-6 sm:p-8">
+      <div className="bg-[#090f1d]/75 backdrop-blur-md border border-cyan-800/50 rounded-3xl p-6 sm:p-8 shadow-xl">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
@@ -132,7 +132,7 @@ export const SecurityPage: React.FC = () => {
             className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium transition-all ${
               selectedCategory === cat.key
                 ? 'bg-gradient-to-r from-cyan-950 to-teal-950 text-cyan-300 border border-cyan-700/60 shadow'
-                : 'bg-[#0c1322] border border-slate-800 text-slate-400 hover:text-slate-200'
+                : 'bg-[#090f1d]/75 backdrop-blur-md border border-slate-800/80 text-slate-400 hover:text-slate-200 hover:-translate-y-0.5'
             }`}
           >
             {cat.icon}
@@ -146,7 +146,7 @@ export const SecurityPage: React.FC = () => {
         {filtered.map((ctrl) => (
           <div
             key={ctrl.id}
-            className="bg-[#0c1322] border border-slate-800 rounded-3xl p-5 hover:border-cyan-500/40 transition-all flex flex-col justify-between"
+            className="bg-[#090f1d]/75 backdrop-blur-md border border-slate-800/80 rounded-3xl p-5 hover:border-cyan-500/50 hover:-translate-y-1 hover:shadow-cyan-500/10 transition-all duration-200 flex flex-col justify-between shadow-xl"
           >
             <div>
               <div className="flex items-center justify-between mb-2.5">

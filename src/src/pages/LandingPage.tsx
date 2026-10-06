@@ -95,7 +95,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
 
         {/* Quick architecture banner */}
-        <div className="mt-14 inline-flex flex-wrap items-center justify-center gap-4 sm:gap-6 px-6 py-3 rounded-2xl bg-[#0c1322] border border-slate-800 text-xs font-mono text-slate-400">
+        <div className="mt-14 inline-flex flex-wrap items-center justify-center gap-4 sm:gap-6 px-6 py-3 rounded-2xl bg-[#090f1d]/75 backdrop-blur-md border border-slate-800/80 text-xs font-mono text-slate-400 shadow-xl">
           <span className="flex items-center gap-2">
             <Lock className="w-4 h-4 text-cyan-400" /> {t('landing.zeroPlaintextStorage')}
           </span>
@@ -114,7 +114,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <section className="px-6 lg:px-12 py-16 max-w-6xl mx-auto w-full">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Block 1: Manage finances */}
-          <div className="relative group bg-[#0c1322] border border-slate-800 rounded-2xl p-7 hover:border-cyan-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-cyan-950/20">
+          <div className="relative group bg-[#090f1d]/75 backdrop-blur-md border border-slate-800/80 rounded-2xl p-7 hover:border-cyan-500/50 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-cyan-500/10">
             <div className="w-12 h-12 rounded-xl bg-cyan-950/60 border border-cyan-800/60 flex items-center justify-center text-cyan-400 mb-5 group-hover:scale-110 transition-transform">
               <Wallet className="w-6 h-6" />
             </div>
@@ -125,7 +125,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           {/* Block 2: Understand spending */}
-          <div className="relative group bg-[#0c1322] border border-slate-800 rounded-2xl p-7 hover:border-teal-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-teal-950/20">
+          <div className="relative group bg-[#090f1d]/75 backdrop-blur-md border border-slate-800/80 rounded-2xl p-7 hover:border-teal-500/50 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-teal-500/10">
             <div className="w-12 h-12 rounded-xl bg-teal-950/60 border border-teal-800/60 flex items-center justify-center text-teal-400 mb-5 group-hover:scale-110 transition-transform">
               <TrendingUp className="w-6 h-6" />
             </div>
@@ -136,7 +136,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           {/* Block 3: Protect money */}
-          <div className="relative group bg-[#0c1322] border border-slate-800 rounded-2xl p-7 hover:border-cyan-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-cyan-950/20">
+          <div className="relative group bg-[#090f1d]/75 backdrop-blur-md border border-slate-800/80 rounded-2xl p-7 hover:border-cyan-500/50 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-cyan-500/10">
             <div className="w-12 h-12 rounded-xl bg-cyan-950/60 border border-cyan-800/60 flex items-center justify-center text-cyan-400 mb-5 group-hover:scale-110 transition-transform">
               <ShieldAlert className="w-6 h-6" />
             </div>
@@ -149,7 +149,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* Footer */}
-      <footer className="mt-auto border-t border-slate-800/80 bg-[#090e1a] px-6 lg:px-12 py-8 text-center text-xs text-slate-500 font-mono">
+      <footer className="mt-auto border-t border-slate-800/80 bg-[#090e1a]/70 backdrop-blur-md px-6 lg:px-12 py-8 text-center text-xs text-slate-500 font-mono">
         <p>
           {t('common.copyright')}
         </p>

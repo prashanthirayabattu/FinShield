@@ -125,7 +125,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
         <LanguageSelector variant="compact" />
       </div>
 
-      <div className="w-full max-w-md bg-[#0c1322] border border-slate-800 rounded-3xl p-8 shadow-2xl relative z-10 mt-8 sm:mt-0">
+      <div className="w-full max-w-md bg-[#090f1d]/85 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-8 shadow-2xl relative z-10 mt-8 sm:mt-0 hover:border-slate-700/80 transition-all duration-300">
         {/* Header Logo */}
         <div className="flex flex-col items-center text-center mb-6">
           <FinShieldLogo

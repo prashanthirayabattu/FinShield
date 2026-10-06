@@ -101,7 +101,7 @@ export const AIAssistantPage: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in max-w-5xl mx-auto">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-[#0a1424] via-[#091522] to-[#070e1c] border border-cyan-800/40 rounded-3xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="bg-[#090f1d]/75 backdrop-blur-md border border-cyan-800/50 rounded-3xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <Badge variant="cyan">{t('nav.protectedBadge')}</Badge>
@@ -133,7 +133,7 @@ export const AIAssistantPage: React.FC = () => {
               type="button"
               disabled={isLoading}
               onClick={() => handleSend(q)}
-              className="px-3.5 py-2 rounded-xl bg-[#0c1322] border border-slate-800 hover:border-cyan-500/60 text-xs text-slate-300 hover:text-cyan-300 transition-all text-left flex items-center gap-2 shadow-sm disabled:opacity-50 cursor-pointer"
+              className="px-3.5 py-2 rounded-xl bg-[#090f1d]/75 backdrop-blur-md border border-slate-800/80 hover:border-cyan-500/60 hover:-translate-y-0.5 hover:shadow-cyan-500/10 text-xs text-slate-300 hover:text-cyan-300 transition-all text-left flex items-center gap-2 shadow-sm disabled:opacity-50 cursor-pointer"
             >
               <HelpCircle className="w-3.5 h-3.5 text-slate-500 shrink-0" />
               <span>{q}</span>
@@ -151,7 +151,7 @@ export const AIAssistantPage: React.FC = () => {
       )}
 
       {/* Chat Window Shell */}
-      <div className="bg-[#0c1322] border border-slate-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[520px]">
+      <div className="bg-[#090f1d]/75 backdrop-blur-md border border-slate-800/80 rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[520px]">
         {/* Messages Body */}
         <div className="flex-1 p-6 overflow-y-auto space-y-4">
           {messages.map((m) => (
@@ -210,12 +210,19 @@ export const AIAssistantPage: React.FC = () => {
 
           {isLoading && (
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-xl bg-slate-800 text-teal-400 border border-slate-700 flex items-center justify-center shrink-0">
-                <Bot className="w-4 h-4 animate-pulse" />
+              <div className="relative w-8 h-8 rounded-xl bg-cyan-950/70 text-cyan-300 border border-cyan-500/50 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(34,211,238,0.3)]">
+                <span className="absolute -inset-1 rounded-xl bg-cyan-400/20 blur animate-pulse" />
+                <Bot className="relative z-10 w-4 h-4 animate-pulse" />
               </div>
-              <div className="bg-slate-900/90 text-slate-300 border border-slate-800 rounded-2xl rounded-tl-none p-4 text-xs flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                <span>{t('ai.analyzingProgress')}</span>
+              <div className="relative bg-[#070e1c]/90 text-cyan-200 border border-cyan-800/60 rounded-2xl rounded-tl-none p-4 text-xs flex items-center gap-3 shadow-lg shadow-cyan-950/20">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
+                  <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="font-semibold text-slate-100">{t('ai.analyzingProgress')}</span>
+                  <span className="text-[10px] font-mono text-cyan-400/80">Neural Intelligence Core Querying...</span>
+                </div>
               </div>
             </div>
           )}

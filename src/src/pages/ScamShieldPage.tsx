@@ -92,7 +92,7 @@ export const ScamShieldPage: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-[#0c1626] via-[#091522] to-[#070e1c] border border-cyan-800/40 rounded-3xl p-6 sm:p-8">
+      <div className="bg-[#090f1d]/75 backdrop-blur-md border border-cyan-800/50 rounded-3xl p-6 sm:p-8 shadow-xl">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
@@ -146,8 +146,8 @@ export const ScamShieldPage: React.FC = () => {
           }}
           className={`flex items-center gap-3 p-4 rounded-2xl border transition-all text-left ${
             activeTab === 'MESSAGE'
-              ? 'bg-[#0d172a] border-cyan-500/70 shadow-lg shadow-cyan-950/25'
-              : 'bg-[#0c1322] border-slate-800 hover:border-slate-700 text-slate-400'
+              ? 'bg-[#0d172a]/90 backdrop-blur-md border-cyan-500/70 shadow-lg shadow-cyan-950/25'
+              : 'bg-[#090f1d]/75 backdrop-blur-md border-slate-800/80 hover:border-slate-700 text-slate-400 hover:-translate-y-0.5'
           }`}
         >
           <div
@@ -181,8 +181,8 @@ export const ScamShieldPage: React.FC = () => {
           }}
           className={`flex items-center gap-3 p-4 rounded-2xl border transition-all text-left ${
             activeTab === 'URL'
-              ? 'bg-[#0d172a] border-cyan-500/70 shadow-lg shadow-cyan-950/25'
-              : 'bg-[#0c1322] border-slate-800 hover:border-slate-700 text-slate-400'
+              ? 'bg-[#0d172a]/90 backdrop-blur-md border-cyan-500/70 shadow-lg shadow-cyan-950/25'
+              : 'bg-[#090f1d]/75 backdrop-blur-md border-slate-800/80 hover:border-slate-700 text-slate-400 hover:-translate-y-0.5'
           }`}
         >
           <div
@@ -216,8 +216,8 @@ export const ScamShieldPage: React.FC = () => {
           }}
           className={`flex items-center gap-3 p-4 rounded-2xl border transition-all text-left ${
             activeTab === 'UPI'
-              ? 'bg-[#0d172a] border-cyan-500/70 shadow-lg shadow-cyan-950/25'
-              : 'bg-[#0c1322] border-slate-800 hover:border-slate-700 text-slate-400'
+              ? 'bg-[#0d172a]/90 backdrop-blur-md border-cyan-500/70 shadow-lg shadow-cyan-950/25'
+              : 'bg-[#090f1d]/75 backdrop-blur-md border-slate-800/80 hover:border-slate-700 text-slate-400 hover:-translate-y-0.5'
           }`}
         >
           <div
@@ -245,7 +245,7 @@ export const ScamShieldPage: React.FC = () => {
       </div>
 
       {/* Input Shell */}
-      <div className="bg-[#0c1322] border border-slate-800 rounded-3xl p-6">
+      <div className="bg-[#090f1d]/75 backdrop-blur-md border border-slate-800/80 rounded-3xl p-6 shadow-xl">
         <form onSubmit={handleInspect} className="space-y-4">
           <div className="flex items-center justify-between">
             <label className="text-xs font-semibold uppercase tracking-wider text-slate-300">
@@ -285,6 +285,17 @@ export const ScamShieldPage: React.FC = () => {
             </div>
           )}
 
+          {/* Radar / Scanner Beam when analysis is running */}
+          {isInspecting && (
+            <div className="relative overflow-hidden rounded-2xl h-12 bg-cyan-950/40 border border-cyan-500/50 flex items-center justify-center shadow-[0_0_15px_rgba(34,211,238,0.2)]">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent animate-scan-sweep" />
+              <div className="relative z-10 flex items-center gap-2 text-xs font-mono font-bold text-cyan-300">
+                <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
+                <span>{t('scamshield.analyzing')} — Threat Intelligence Radar Active</span>
+              </div>
+            </div>
+          )}
+
           <div className="flex items-center justify-between pt-1">
             <p className="text-[11px] text-slate-400 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
@@ -305,7 +316,7 @@ export const ScamShieldPage: React.FC = () => {
 
       {/* Risk Analysis Result */}
       {scanResult ? (
-        <div className="bg-[#0c1322] border border-slate-800 rounded-3xl p-6 shadow-xl space-y-5">
+        <div className="bg-[#090f1d]/75 backdrop-blur-md border border-slate-800/80 rounded-3xl p-6 shadow-xl space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-800/80 gap-3">
             <div>
               <div className="flex items-center gap-2">
@@ -466,7 +477,7 @@ export const ScamShieldPage: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="p-8 text-center text-slate-500 text-xs bg-[#0c1322] border border-slate-800 rounded-3xl">
+        <div className="p-8 text-center text-slate-500 text-xs bg-[#090f1d]/75 backdrop-blur-md border border-slate-800/80 rounded-3xl shadow-xl">
           {t('scamshield.emptyStateTitle')}
         </div>
       )}

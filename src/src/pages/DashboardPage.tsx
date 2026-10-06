@@ -105,7 +105,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Welcome banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gradient-to-r from-[#0c1424] via-[#0e182c] to-[#0a1220] border border-cyan-900/40 rounded-3xl p-6 sm:p-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-[#090f1d]/75 backdrop-blur-md border border-cyan-900/50 rounded-3xl p-6 sm:p-8 shadow-xl">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <Badge variant="cyan">{t('dashboard.trackBadge')}</Badge>
@@ -205,7 +205,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       {/* Two Column Layout: Budget Progress & Category Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Budget Progress Card */}
-        <div className="bg-[#0c1322] border border-slate-800 rounded-3xl p-6">
+        <div className="bg-[#090f1d]/75 backdrop-blur-md border border-slate-800/80 rounded-3xl p-6 shadow-xl hover:border-slate-700/80 transition-all duration-300">
           <div className="flex items-center justify-between mb-5">
             <div>
               <h3 className="text-base font-bold text-slate-100">
@@ -305,7 +305,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         </div>
 
         {/* Spending by Category Card */}
-        <div className="bg-[#0c1322] border border-slate-800 rounded-3xl p-6">
+        <div className="bg-[#090f1d]/75 backdrop-blur-md border border-slate-800/80 rounded-3xl p-6 shadow-xl hover:border-slate-700/80 transition-all duration-300">
           <div className="flex items-center justify-between mb-5">
             <div>
               <h3 className="text-base font-bold text-slate-100">
@@ -353,7 +353,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       </div>
 
       {/* Recent Transactions Table */}
-      <div className="bg-[#0c1322] border border-slate-800 rounded-3xl p-6">
+      <div className="bg-[#090f1d]/75 backdrop-blur-md border border-slate-800/80 rounded-3xl p-6 shadow-xl hover:border-slate-700/80 transition-all duration-300">
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2">
             <Receipt className="w-5 h-5 text-cyan-400" />

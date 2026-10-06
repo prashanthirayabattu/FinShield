@@ -3,7 +3,7 @@ import type { TranslationDictionary } from './types';
 export const te: TranslationDictionary = {
   common: {
     brand: 'FinShield',
-    subtitle: 'టీమ్ 50 • టెక్ ట్రైబ్',
+    subtitle: 'సురక్షిత ఆర్థిక ఇంటెలిజెన్స్',
     loading: 'లోడ్ అవుతోంది...',
     saving: 'భద్రపరుస్తోంది...',
     cancel: 'రద్దు చేయి',
@@ -39,7 +39,7 @@ export const te: TranslationDictionary = {
     liveNeonPostgres: 'నియాన్ పోస్ట్‌గ్రేస్‌క్యూఎల్ లైవ్',
     mainnetGuardActive: 'ప్రధాన భద్రతా కవచం సక్రియం',
     buildSecureTrack: 'బిల్డ్ సెక్యూర్ 24 — అధికారిక ట్రాక్ PS-01',
-    copyright: 'ఫిన్‌షీల్డ్ • టీమ్ 50 (టెక్ ట్రైబ్) • బిల్డ్ సెక్యూర్ 24 గంటల హ్యాకథాన్ — అభేద్య (VBIT సైబర్‌సెక్యూరిటీ ఫోరమ్)',
+    copyright: 'ఫిన్‌షీల్డ్ • సురక్షిత ఆర్థిక ఇంటెలిజెన్స్ • బిల్డ్ సెక్యూర్',
     liveWindowBadge: 'హ్యాకథాన్ సమయంలో ప్రత్యక్షంగా రూపొందించబడింది • లైవ్ ఆరిజిన్ ధ్రువీకరణ',
     currency: '₹',
   },

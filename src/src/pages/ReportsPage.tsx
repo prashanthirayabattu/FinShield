@@ -61,7 +61,7 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ transactions }) => {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-[#0c1626] via-[#091522] to-[#070e1c] border border-cyan-800/40 rounded-3xl p-6 sm:p-8">
+      <div className="bg-[#090f1d]/75 backdrop-blur-md border border-cyan-800/50 rounded-3xl p-6 sm:p-8 shadow-xl">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <Badge variant="cyan">{t('dashboard.trackBadge')}</Badge>
@@ -99,7 +99,7 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ transactions }) => {
       {/* 3 Report Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Card 1: Export financial data */}
-        <div className="bg-[#0c1322] border border-slate-800 rounded-3xl p-6 flex flex-col justify-between hover:border-cyan-500/40 transition-all">
+        <div className="bg-[#090f1d]/75 backdrop-blur-md border border-slate-800/80 rounded-3xl p-6 flex flex-col justify-between hover:border-cyan-500/50 hover:-translate-y-1 hover:shadow-cyan-500/10 transition-all duration-200 shadow-xl">
           <div>
             <div className="w-12 h-12 rounded-2xl bg-cyan-950/60 border border-cyan-800/60 flex items-center justify-center text-cyan-400 mb-4">
               <FileSpreadsheet className="w-6 h-6" />
@@ -127,7 +127,7 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ transactions }) => {
         </div>
 
         {/* Card 2: Security Audit Report */}
-        <div className="bg-[#0c1322] border border-slate-800 rounded-3xl p-6 flex flex-col justify-between hover:border-teal-500/40 transition-all">
+        <div className="bg-[#090f1d]/75 backdrop-blur-md border border-slate-800/80 rounded-3xl p-6 flex flex-col justify-between hover:border-teal-500/50 hover:-translate-y-1 hover:shadow-teal-500/10 transition-all duration-200 shadow-xl">
           <div>
             <div className="w-12 h-12 rounded-2xl bg-teal-950/60 border border-teal-800/60 flex items-center justify-center text-teal-400 mb-4">
               <Shield className="w-6 h-6" />
@@ -154,7 +154,7 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ transactions }) => {
         </div>
 
         {/* Card 3: Monthly Transaction Summary */}
-        <div className="bg-[#0c1322] border border-slate-800 rounded-3xl p-6 flex flex-col justify-between hover:border-cyan-500/40 transition-all">
+        <div className="bg-[#090f1d]/75 backdrop-blur-md border border-slate-800/80 rounded-3xl p-6 flex flex-col justify-between hover:border-cyan-500/50 hover:-translate-y-1 hover:shadow-cyan-500/10 transition-all duration-200 shadow-xl">
           <div>
             <div className="w-12 h-12 rounded-2xl bg-cyan-950/60 border border-cyan-800/60 flex items-center justify-center text-cyan-400 mb-4">
               <FileText className="w-6 h-6" />
@@ -182,7 +182,7 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ transactions }) => {
       </div>
 
       {/* CSV Security Explainer */}
-      <div className="p-5 rounded-2xl bg-[#0c1322] border border-slate-800 text-xs text-slate-400 space-y-2">
+      <div className="p-5 rounded-2xl bg-[#090f1d]/75 backdrop-blur-md border border-slate-800/80 text-xs text-slate-400 space-y-2 shadow-xl">
         <h4 className="font-bold text-slate-200 flex items-center gap-2">
           <Lock className="w-4 h-4 text-cyan-400" /> {t('reports.formulaDefenseTitle')}
         </h4>

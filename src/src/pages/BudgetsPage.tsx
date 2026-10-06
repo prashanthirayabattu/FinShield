@@ -142,7 +142,7 @@ export const BudgetsPage: React.FC<BudgetsPageProps> = ({
       )}
 
       {/* High-level Summary Card */}
-      <div className="bg-[#0c1322] border border-slate-800 rounded-3xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div className="bg-[#090f1d]/75 backdrop-blur-md border border-slate-800/80 rounded-3xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-xl">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-cyan-950/60 border border-cyan-800/60 flex items-center justify-center text-cyan-400 shadow-md">
             <PieChart className="w-6 h-6" />
@@ -206,12 +206,12 @@ export const BudgetsPage: React.FC<BudgetsPageProps> = ({
             return (
               <div
                 key={b.id}
-                className={`relative bg-[#0c1322] border rounded-3xl p-6 transition-all duration-200 hover:shadow-xl ${
+                className={`relative bg-[#090f1d]/75 backdrop-blur-md border rounded-3xl p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-xl ${
                   isExceeded
                     ? 'border-rose-900/60 shadow-rose-950/20'
                     : isWarning
                     ? 'border-amber-900/60 shadow-amber-950/20'
-                    : 'border-slate-800 hover:border-cyan-500/40 shadow-cyan-950/10'
+                    : 'border-slate-800/80 hover:border-cyan-500/50 hover:shadow-cyan-500/10'
                 }`}
               >
                 {/* Category Header */}

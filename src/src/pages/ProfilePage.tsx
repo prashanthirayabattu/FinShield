@@ -35,7 +35,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   return (
     <div className="space-y-6 animate-fade-in max-w-4xl mx-auto">
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-[#0c1626] via-[#091522] to-[#070e1c] border border-cyan-800/40 rounded-3xl p-6 sm:p-8">
+      <div className="bg-[#090f1d]/75 backdrop-blur-md border border-cyan-800/50 rounded-3xl p-6 sm:p-8 shadow-xl">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-cyan-500 via-teal-400 to-cyan-300 flex items-center justify-center text-slate-950 font-black text-2xl shadow-xl shadow-cyan-500/20">
@@ -77,7 +77,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       {/* Profile Form & RBAC Simulator Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Personal Details */}
-        <div className="bg-[#0c1322] border border-slate-800 rounded-3xl p-6">
+        <div className="bg-[#090f1d]/75 backdrop-blur-md border border-slate-800/80 rounded-3xl p-6 shadow-xl">
           <h3 className="text-base font-bold text-white mb-1 flex items-center gap-2">
             <User className="w-4 h-4 text-cyan-400" /> {t('profile.accountDetails')}
           </h3>
@@ -122,7 +122,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         </div>
 
         {/* Role-Based Access Control (RBAC) Switcher */}
-        <div className="bg-[#0c1322] border border-slate-800 rounded-3xl p-6 flex flex-col justify-between">
+        <div className="bg-[#090f1d]/75 backdrop-blur-md border border-slate-800/80 rounded-3xl p-6 flex flex-col justify-between shadow-xl">
           <div>
             <h3 className="text-base font-bold text-white mb-1 flex items-center gap-2">
               <Users className="w-4 h-4 text-teal-400" /> {t('profile.rbacSimulatorTitle')}

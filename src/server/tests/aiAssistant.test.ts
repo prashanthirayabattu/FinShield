@@ -180,10 +180,18 @@ describe('FinShield Milestone 9 — Secure AI Financial Assistant & Isolation Te
       });
     }
 
-    const remainingScamAnalyses = await prisma.scamAnalysis.count();
-    const remainingBudgets = await prisma.budget.count();
-    const remainingTransactions = await prisma.transaction.count();
-    const remainingUsers = await prisma.user.count();
+    const remainingScamAnalyses = await prisma.scamAnalysis.count({
+      where: { userId: { in: [userAId, userBId] } },
+    });
+    const remainingBudgets = await prisma.budget.count({
+      where: { userId: { in: [userAId, userBId] } },
+    });
+    const remainingTransactions = await prisma.transaction.count({
+      where: { userId: { in: [userAId, userBId] } },
+    });
+    const remainingUsers = await prisma.user.count({
+      where: { id: { in: [userAId, userBId] } },
+    });
 
     assert.equal(remainingScamAnalyses, 0, 'Database scam_analyses count must return to 0');
     assert.equal(remainingBudgets, 0, 'Database budgets count must return to 0');

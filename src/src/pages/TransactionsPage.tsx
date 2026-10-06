@@ -209,7 +209,7 @@ export const TransactionsPage: React.FC<TransactionsPageProps> = ({
       )}
 
       {/* Filter and Search Bar */}
-      <div className="bg-[#0c1322] border border-slate-800 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="bg-[#090f1d]/75 backdrop-blur-md border border-slate-800/80 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 shadow-xl">
         {/* Search Input */}
         <div className="relative">
           <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -265,7 +265,7 @@ export const TransactionsPage: React.FC<TransactionsPageProps> = ({
       </div>
 
       {/* Transactions Table */}
-      <div className="bg-[#0c1322] border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
+      <div className="bg-[#090f1d]/75 backdrop-blur-md border border-slate-800/80 rounded-3xl overflow-hidden shadow-xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>

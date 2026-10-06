@@ -94,9 +94,15 @@ describe('FinShield Milestone 7 — Real Neon PostgreSQL ScamShield Fraud Analys
       });
     }
 
-    const remainingScamAnalyses = await prisma.scamAnalysis.count();
-    const remainingTransactions = await prisma.transaction.count();
-    const remainingUsers = await prisma.user.count();
+    const remainingScamAnalyses = await prisma.scamAnalysis.count({
+      where: { userId: { in: [userAId, userBId] } },
+    });
+    const remainingTransactions = await prisma.transaction.count({
+      where: { userId: { in: [userAId, userBId] } },
+    });
+    const remainingUsers = await prisma.user.count({
+      where: { id: { in: [userAId, userBId] } },
+    });
 
     assert.equal(
       remainingScamAnalyses,

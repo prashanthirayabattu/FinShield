@@ -104,7 +104,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   return (
     <div className="min-h-screen bg-transparent relative z-10 text-slate-100 flex flex-col md:flex-row">
       {/* Mobile Header */}
-      <header className="md:hidden flex items-center justify-between px-4 py-3 bg-[#0a101d] border-b border-slate-800/80 sticky top-0 z-40">
+      <header className="md:hidden flex items-center justify-between px-4 py-3 bg-[#090f1d]/85 backdrop-blur-xl border-b border-slate-800/80 sticky top-0 z-40">
         <div className="flex items-center gap-2">
           <FinShieldLogo size="sm" showWordmark={true} />
         </div>
@@ -122,7 +122,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
 
       {/* Sidebar Navigation */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#090e1a] border-r border-slate-800/80 flex flex-col transition-transform duration-200 md:static md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#090f1d]/85 backdrop-blur-xl border-r border-slate-800/80 flex flex-col transition-transform duration-200 md:static md:translate-x-0 ${
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -226,7 +226,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar with language selector and quick navigation */}
-        <header className="hidden md:flex items-center justify-between px-8 py-4 border-b border-slate-800/60 bg-[#090e1a]/40 backdrop-blur-md">
+        <header className="hidden md:flex items-center justify-between px-8 py-4 border-b border-slate-800/60 bg-[#090f1d]/60 backdrop-blur-md">
           <div className="flex items-center gap-3">
             <h1 className="text-base font-semibold text-slate-200">
               {getPageTitle(currentView)}

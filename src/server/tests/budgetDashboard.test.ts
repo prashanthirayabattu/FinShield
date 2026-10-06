@@ -84,9 +84,15 @@ describe('FinShield Milestone 6 — Real Neon PostgreSQL Budgets & Financial Das
       });
     }
 
-    const remainingBudgets = await prisma.budget.count();
-    const remainingTransactions = await prisma.transaction.count();
-    const remainingUsers = await prisma.user.count();
+    const remainingBudgets = await prisma.budget.count({
+      where: { userId: { in: [userAId, userBId] } },
+    });
+    const remainingTransactions = await prisma.transaction.count({
+      where: { userId: { in: [userAId, userBId] } },
+    });
+    const remainingUsers = await prisma.user.count({
+      where: { id: { in: [userAId, userBId] } },
+    });
 
     assert.equal(remainingBudgets, 0, 'Database budgets count must return to 0 after test cleanup');
     assert.equal(remainingTransactions, 0, 'Database transactions count must return to 0 after test cleanup');

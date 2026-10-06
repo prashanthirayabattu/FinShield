@@ -3,7 +3,7 @@ import type { TranslationDictionary } from './types';
 export const hi: TranslationDictionary = {
   common: {
     brand: 'FinShield',
-    subtitle: 'टीम 50 • टेक ट्राइब',
+    subtitle: 'सुरक्षित वित्तीय इंटेलिजेंस',
     loading: 'लोड हो रहा है...',
     saving: 'सहेजा जा रहा है...',
     cancel: 'रद्द करें',
@@ -39,7 +39,7 @@ export const hi: TranslationDictionary = {
     liveNeonPostgres: 'नियॉन पोस्टग्रेएसक्यूएल लाइव',
     mainnetGuardActive: 'सुरक्षा गार्ड सक्रिय',
     buildSecureTrack: 'बिल्ड सिक्योर 24 — आधिकारिक ट्रैक PS-01',
-    copyright: 'फ़िनशील्ड • टीम 50 (टेक ट्राइब) • बिल्ड सिक्योर 24 घंटे हैकाथॉन — अभेद्य (VBIT साइबरसिक्योरिटी फ़ोरम)',
+    copyright: 'फ़िनशील्ड • सुरक्षित वित्तीय इंटेलिजेंस • बिल्ड सिक्योर',
     liveWindowBadge: 'हैकाथॉन के दौरान लाइव निर्मित • लाइव ओरिजिन सत्यापन',
     currency: '₹',
   },

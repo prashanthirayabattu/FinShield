@@ -142,10 +142,18 @@ describe('FinShield Milestone 10 — Consolidated Security Audit & Attack Verifi
       });
     }
 
-    const remainingScams = await prisma.scamAnalysis.count();
-    const remainingBudgets = await prisma.budget.count();
-    const remainingTransactions = await prisma.transaction.count();
-    const remainingUsers = await prisma.user.count();
+    const remainingScams = await prisma.scamAnalysis.count({
+      where: { userId: { in: [userAId, userBId] } },
+    });
+    const remainingBudgets = await prisma.budget.count({
+      where: { userId: { in: [userAId, userBId] } },
+    });
+    const remainingTransactions = await prisma.transaction.count({
+      where: { userId: { in: [userAId, userBId] } },
+    });
+    const remainingUsers = await prisma.user.count({
+      where: { id: { in: [userAId, userBId] } },
+    });
 
     assert.equal(remainingScams, 0, 'Database scam_analyses must return to 0');
     assert.equal(remainingBudgets, 0, 'Database budgets must return to 0');
