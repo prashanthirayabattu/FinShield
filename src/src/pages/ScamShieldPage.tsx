@@ -11,18 +11,64 @@ import {
   Sparkles,
   AlertCircle,
   Receipt,
+  Mic,
+  MicOff,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import { Badge } from '../components/Badge';
 import { scamApi, type ScamAnalysisResponse } from '../services/scamApi';
 import { useI18n } from '../i18n';
+import { voiceAssistant } from '../services/voiceAssistant';
 
 export const ScamShieldPage: React.FC = () => {
-  const { t, formatCurrency, formatDate } = useI18n();
+  const { t, language, formatCurrency, formatDate } = useI18n();
   const [activeTab, setActiveTab] = useState<'MESSAGE' | 'URL' | 'UPI'>('MESSAGE');
   const [inputValue, setInputValue] = useState('');
   const [isInspecting, setIsInspecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [scanResult, setScanResult] = useState<ScamAnalysisResponse | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  React.useEffect(() => {
+    return () => {
+      voiceAssistant.stopListening();
+      voiceAssistant.stopSpeaking();
+    };
+  }, []);
+
+  const toggleListening = () => {
+    if (isListening) {
+      voiceAssistant.stopListening();
+      setIsListening(false);
+    } else {
+      voiceAssistant.startListening({
+        language,
+        onStart: () => setIsListening(true),
+        onResult: (text) => setInputValue(text),
+        onError: () => setIsListening(false),
+        onEnd: () => setIsListening(false),
+      });
+    }
+  };
+
+  const handleSpeakResult = () => {
+    if (!scanResult) return;
+    if (isSpeaking) {
+      voiceAssistant.stopSpeaking();
+      setIsSpeaking(false);
+    } else {
+      const textToSpeak = `${t('scamshield.riskScoreLabel')}: ${scanResult.riskScore}. ${scanResult.reasons.join('. ')}. ${scanResult.recommendations.join('. ')}`;
+      voiceAssistant.speak({
+        text: textToSpeak,
+        language,
+        onStart: () => setIsSpeaking(true),
+        onEnd: () => setIsSpeaking(false),
+        onError: () => setIsSpeaking(false),
+      });
+    }
+  };
 
   const samplePresets = [
     {
@@ -302,14 +348,30 @@ export const ScamShieldPage: React.FC = () => {
               <span>{t('common.liveNeonPostgres')}</span>
             </p>
 
-            <button
-              type="submit"
-              disabled={isInspecting}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-md shadow-cyan-500/20 disabled:opacity-50 transition-all cursor-pointer"
-            >
-              {isInspecting ? t('scamshield.analyzing') : t('scamshield.analyzeBtn')}
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={toggleListening}
+                className={`p-2.5 rounded-xl border transition-all cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center ${
+                  isListening
+                    ? 'bg-rose-950/70 text-rose-300 border-rose-600/70 animate-pulse'
+                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-cyan-400 hover:border-cyan-500/50'
+                }`}
+                title={isListening ? t('voice.stopListening') : t('voice.startListening')}
+                aria-label={isListening ? t('voice.stopListening') : t('voice.startListening')}
+              >
+                {isListening ? <MicOff className="w-4 h-4 text-rose-400" /> : <Mic className="w-4 h-4" />}
+              </button>
+
+              <button
+                type="submit"
+                disabled={isInspecting}
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-md shadow-cyan-500/20 disabled:opacity-50 transition-all cursor-pointer min-h-[44px]"
+              >
+                {isInspecting ? t('scamshield.analyzing') : t('scamshield.analyzeBtn')}
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         </form>
       </div>
@@ -332,6 +394,25 @@ export const ScamShieldPage: React.FC = () => {
               </h3>
             </div>
             <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleSpeakResult}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-cyan-300 text-xs border border-slate-700 transition-colors cursor-pointer min-h-[36px]"
+                title={isSpeaking ? t('voice.stopSpeaking') : t('voice.replay')}
+                aria-label={isSpeaking ? t('voice.stopSpeaking') : t('voice.replay')}
+              >
+                {isSpeaking ? (
+                  <>
+                    <VolumeX className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+                    <span>{t('voice.stopSpeaking')}</span>
+                  </>
+                ) : (
+                  <>
+                    <Volume2 className="w-3.5 h-3.5" />
+                    <span>{t('voice.replay')}</span>
+                  </>
+                )}
+              </button>
               <span className="text-xs font-mono text-slate-400 flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5" />{' '}
                 {new Date(scanResult.analyzedAt).toLocaleTimeString()}

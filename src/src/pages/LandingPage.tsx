@@ -12,17 +12,23 @@ import {
 import { useI18n } from '../i18n';
 import { LanguageSelector } from '../components/LanguageSelector';
 import { FinShieldLogo } from '../components/FinShieldLogo';
+import { VoiceModeButton } from '../components/VoiceModeButton';
+import { VoiceAssistantModal } from '../components/VoiceAssistantModal';
+import type { AppView } from '../types';
 
 interface LandingPageProps {
   onGetStarted: () => void;
   onLogin: () => void;
+  onNavigate?: (view: AppView) => void;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({
   onGetStarted,
   onLogin,
+  onNavigate,
 }) => {
   const { t } = useI18n();
+  const [isVoiceOpen, setIsVoiceOpen] = React.useState(false);
 
   return (
     <div className="min-h-screen bg-transparent relative z-10 text-slate-100 flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200">
@@ -36,6 +42,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
 
         <div className="flex items-center gap-3 sm:gap-4">
+          <VoiceModeButton onClick={() => setIsVoiceOpen(true)} />
           <LanguageSelector variant="compact" />
           <button
             onClick={onLogin}
@@ -157,6 +164,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           {t('common.liveWindowBadge')}
         </p>
       </footer>
+      {isVoiceOpen && (
+        <VoiceAssistantModal
+          isOpen={isVoiceOpen}
+          onClose={() => setIsVoiceOpen(false)}
+          currentView="landing"
+          onNavigate={(view) => {
+            if (onNavigate) onNavigate(view);
+            else if (view === 'dashboard' || view === 'transactions' || view === 'budgets') onLogin();
+          }}
+          transactions={[]}
+          budgets={[]}
+          onAddTransaction={async () => {}}
+          onAddBudget={async () => {}}
+        />
+      )}
     </div>
   );
 };

@@ -14,16 +14,22 @@ import {
   ShieldCheck,
   ExternalLink,
 } from 'lucide-react';
-import type { AppView, UserProfile } from '../types';
+import type { AppView, UserProfile, Transaction, Budget } from '../types';
 import { useI18n } from '../i18n';
 import { LanguageSelector } from '../components/LanguageSelector';
 import { FinShieldLogo } from '../components/FinShieldLogo';
+import { VoiceModeButton } from '../components/VoiceModeButton';
+import { VoiceAssistantModal } from '../components/VoiceAssistantModal';
 
 interface AppLayoutProps {
   currentView: AppView;
   onNavigate: (view: AppView) => void;
   user: UserProfile;
   onLogout: () => void;
+  transactions?: Transaction[];
+  budgets?: Budget[];
+  onAddTransaction?: (tx: Omit<Transaction, 'id'>) => Promise<void>;
+  onAddBudget?: (b: Omit<Budget, 'id'>) => Promise<void>;
   children: React.ReactNode;
 }
 
@@ -32,9 +38,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   onNavigate,
   user,
   onLogout,
+  transactions = [],
+  budgets = [],
+  onAddTransaction = async () => {},
+  onAddBudget = async () => {},
   children,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isVoiceOpen, setIsVoiceOpen] = useState(false);
   const { t } = useI18n();
 
   const navItems: { view: AppView; label: string; icon: React.ReactNode; badge?: string }[] = [
@@ -109,6 +120,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           <FinShieldLogo size="sm" showWordmark={true} />
         </div>
         <div className="flex items-center gap-2">
+          <VoiceModeButton onClick={() => setIsVoiceOpen(true)} />
           <LanguageSelector variant="compact" />
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -238,6 +250,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           </div>
 
           <div className="flex items-center gap-4">
+            <VoiceModeButton onClick={() => setIsVoiceOpen(true)} />
             <LanguageSelector />
             <div className="h-4 w-[1px] bg-slate-800"></div>
             <button
@@ -257,6 +270,20 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         {/* Dynamic Page View */}
         <main className="flex-1 p-4 md:p-8 overflow-y-auto">{children}</main>
       </div>
+
+      {/* Accessible Global Voice Assistant Modal */}
+      {isVoiceOpen && (
+        <VoiceAssistantModal
+          isOpen={isVoiceOpen}
+          onClose={() => setIsVoiceOpen(false)}
+          currentView={currentView}
+          onNavigate={onNavigate}
+          transactions={transactions}
+          budgets={budgets}
+          onAddTransaction={onAddTransaction}
+          onAddBudget={onAddBudget}
+        />
+      )}
     </div>
   );
 };

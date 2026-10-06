@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "tsx --test --test-concurrency=1 server/tests/auth.test.ts server/tests/dbIntegration.test.ts server/tests/transactionIdor.test.ts server/tests/budgetDashboard.test.ts server/tests/scamshield.test.ts server/tests/aiAssistant.test.ts server/tests/securityAudit.test.ts server/tests/i18nCompleteness.test.ts",
+    "test": "tsx --test --test-concurrency=1 server/tests/auth.test.ts server/tests/dbIntegration.test.ts server/tests/transactionIdor.test.ts server/tests/budgetDashboard.test.ts server/tests/scamshield.test.ts server/tests/aiAssistant.test.ts server/tests/securityAudit.test.ts server/tests/i18nCompleteness.test.ts server/tests/voiceCommand.test.ts",
     "test:auth": "tsx --test server/tests/auth.test.ts",
     "test:db": "tsx --test server/tests/dbIntegration.test.ts",
     "test:idor": "tsx --test server/tests/transactionIdor.test.ts",
@@ -17,6 +17,7 @@
     "test:ai": "tsx --test server/tests/aiAssistant.test.ts",
     "test:sec": "tsx --test server/tests/securityAudit.test.ts",
     "test:i18n": "tsx --test server/tests/i18nCompleteness.test.ts",
+    "test:voice": "tsx --test server/tests/voiceCommand.test.ts",
     "db:check": "tsx server/scripts/checkDb.ts"
   },
   "dependencies": {

@@ -283,6 +283,10 @@ export function App() {
             onNavigate={handleNavigate}
             user={user}
             onLogout={handleLogout}
+            transactions={transactions}
+            budgets={budgets}
+            onAddTransaction={handleAddTransaction}
+            onAddBudget={handleAddBudget}
           >
             {currentView === 'dashboard' && (
               <DashboardPage

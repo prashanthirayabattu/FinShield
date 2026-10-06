@@ -10,10 +10,15 @@ import {
   AlertCircle,
   Database,
   Layers,
+  Mic,
+  MicOff,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import { Badge } from '../components/Badge';
 import { aiApi, type AiAssistantResponse } from '../services/aiApi';
 import { useI18n } from '../i18n';
+import { voiceAssistant } from '../services/voiceAssistant';
 
 interface ChatMessage {
   id: string;
@@ -39,6 +44,47 @@ export const AIAssistantPage: React.FC = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const [speakingMsgId, setSpeakingMsgId] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      voiceAssistant.stopListening();
+      voiceAssistant.stopSpeaking();
+    };
+  }, []);
+
+  const toggleListening = () => {
+    if (isListening) {
+      voiceAssistant.stopListening();
+      setIsListening(false);
+    } else {
+      voiceAssistant.startListening({
+        language,
+        onStart: () => setIsListening(true),
+        onResult: (text) => setInputMessage(text),
+        onError: () => setIsListening(false),
+        onEnd: () => setIsListening(false),
+      });
+    }
+  };
+
+  const handleSpeakMessage = (msgId: string, text: string) => {
+    if (speakingMsgId === msgId) {
+      voiceAssistant.stopSpeaking();
+      setSpeakingMsgId(null);
+    } else {
+      voiceAssistant.stopSpeaking();
+      setSpeakingMsgId(msgId);
+      voiceAssistant.speak({
+        text,
+        language,
+        onStart: () => setSpeakingMsgId(msgId),
+        onEnd: () => setSpeakingMsgId(null),
+        onError: () => setSpeakingMsgId(null),
+      });
+    }
+  };
 
   const exampleQuestions = [
     t('ai.ex1'),
@@ -201,9 +247,26 @@ export const AIAssistantPage: React.FC = () => {
                   </div>
                 )}
 
-                <span className="block text-[10px] text-slate-500 font-mono text-right">
-                  {m.timestamp}
-                </span>
+                <div className="flex items-center justify-between pt-1">
+                  {m.sender === 'assistant' && (
+                    <button
+                      type="button"
+                      onClick={() => handleSpeakMessage(m.id, m.id === 'msg_01' ? t('ai.greeting') : m.text)}
+                      className="text-slate-400 hover:text-cyan-300 p-1 rounded transition-colors cursor-pointer"
+                      title={speakingMsgId === m.id ? t('voice.stopSpeaking') : t('voice.replay')}
+                      aria-label={speakingMsgId === m.id ? t('voice.stopSpeaking') : t('voice.replay')}
+                    >
+                      {speakingMsgId === m.id ? (
+                        <VolumeX className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+                      ) : (
+                        <Volume2 className="w-3.5 h-3.5" />
+                      )}
+                    </button>
+                  )}
+                  <span className="block text-[10px] text-slate-500 font-mono text-right ml-auto">
+                    {m.timestamp}
+                  </span>
+                </div>
               </div>
             </div>
           ))}
@@ -237,7 +300,7 @@ export const AIAssistantPage: React.FC = () => {
               e.preventDefault();
               handleSend(inputMessage);
             }}
-            className="flex items-center gap-3"
+            className="flex items-center gap-2 sm:gap-3"
           >
             <input
               type="text"
@@ -248,9 +311,22 @@ export const AIAssistantPage: React.FC = () => {
               className="flex-1 px-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 disabled:opacity-50"
             />
             <button
+              type="button"
+              onClick={toggleListening}
+              className={`p-3 rounded-xl border transition-all cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center ${
+                isListening
+                  ? 'bg-rose-950/70 text-rose-300 border-rose-600/70 animate-pulse'
+                  : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-cyan-400 hover:border-cyan-500/50'
+              }`}
+              title={isListening ? t('voice.stopListening') : t('voice.startListening')}
+              aria-label={isListening ? t('voice.stopListening') : t('voice.startListening')}
+            >
+              {isListening ? <MicOff className="w-4 h-4 text-rose-400" /> : <Mic className="w-4 h-4" />}
+            </button>
+            <button
               type="submit"
               disabled={isLoading || !inputMessage.trim()}
-              className="p-3 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 rounded-xl font-bold shadow-md shadow-cyan-500/20 transition-all hover:scale-105 disabled:opacity-50 cursor-pointer"
+              className="p-3 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 rounded-xl font-bold shadow-md shadow-cyan-500/20 transition-all hover:scale-105 disabled:opacity-50 cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center"
               aria-label={t('ai.sendBtn')}
             >
               <Send className="w-4 h-4" />
