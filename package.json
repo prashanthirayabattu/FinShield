@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "cd src && npm install --include=dev && npx prisma generate && npm run build",
-    "vercel-build": "cd src && npm install --include=dev && npx prisma generate && npm run build",
+    "vercel-build": "cd src && npm install --include=dev && npx prisma generate && npm run build"
   },
   "dependencies": {
     "@prisma/client": "^6.4.1",
