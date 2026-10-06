@@ -17,6 +17,7 @@ import {
 import type { AppView, UserProfile } from '../types';
 import { useI18n } from '../i18n';
 import { LanguageSelector } from '../components/LanguageSelector';
+import { FinShieldLogo } from '../components/FinShieldLogo';
 
 interface AppLayoutProps {
   currentView: AppView;
@@ -101,16 +102,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col md:flex-row">
+    <div className="min-h-screen bg-transparent relative z-10 text-slate-100 flex flex-col md:flex-row">
       {/* Mobile Header */}
       <header className="md:hidden flex items-center justify-between px-4 py-3 bg-[#0a101d] border-b border-slate-800/80 sticky top-0 z-40">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-teal-600 flex items-center justify-center font-bold text-black shadow-lg shadow-cyan-500/20">
-            FS
-          </div>
-          <span className="font-bold tracking-tight text-lg text-white">
-            Fin<span className="text-cyan-400">Shield</span>
-          </span>
+          <FinShieldLogo size="sm" showWordmark={true} />
         </div>
         <div className="flex items-center gap-2">
           <LanguageSelector variant="compact" />
@@ -134,19 +130,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         <div className="p-5 border-b border-slate-800/80 flex items-center justify-between">
           <div
             onClick={() => handleNavClick('dashboard')}
-            className="flex items-center gap-2.5 cursor-pointer"
+            className="cursor-pointer"
           >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 via-teal-400 to-cyan-300 flex items-center justify-center font-black text-slate-950 shadow-md shadow-cyan-500/20">
-              FS
-            </div>
-            <div>
-              <div className="font-bold text-lg tracking-tight text-white flex items-center gap-1">
-                Fin<span className="text-cyan-400">Shield</span>
-              </div>
-              <p className="text-[10px] uppercase tracking-widest text-slate-400 font-mono">
-                {t('common.subtitle')}
-              </p>
-            </div>
+            <FinShieldLogo
+              size="md"
+              showWordmark={true}
+              showSubtitle={true}
+              subtitle={t('common.subtitle')}
+            />
           </div>
           {mobileMenuOpen && (
             <button

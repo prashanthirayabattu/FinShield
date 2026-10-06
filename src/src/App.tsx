@@ -27,6 +27,8 @@ import { transactionApi } from './services/transactionApi';
 import { budgetApi, mapBackendBudgetToFrontend } from './services/budgetApi';
 import { dashboardApi, type DashboardSummaryResponse } from './services/dashboardApi';
 import { useI18n } from './i18n';
+import { GlobalNetworkBackground } from './components/GlobalNetworkBackground';
+import { FinShieldIntroReveal, INTRO_STORAGE_KEY } from './components/FinShieldIntroReveal';
 
 export function App() {
   const { getLocalizedError } = useI18n();
@@ -35,6 +37,24 @@ export function App() {
   const [transactions, setTransactions] = useState<Transaction[]>(INITIAL_TRANSACTIONS);
   const [budgets, setBudgets] = useState<Budget[]>(INITIAL_BUDGETS);
   const [dashboardSummary, setDashboardSummary] = useState<DashboardSummaryResponse | null>(null);
+
+  // Intro Reveal State: only executes once per browser session
+  const [isIntroActive, setIsIntroActive] = useState<boolean>(() => {
+    try {
+      return sessionStorage.getItem(INTRO_STORAGE_KEY) !== 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const handleIntroComplete = () => {
+    setIsIntroActive(false);
+    try {
+      sessionStorage.setItem(INTRO_STORAGE_KEY, 'true');
+    } catch {
+      // Storage access resilience
+    }
+  };
 
   const [isLoadingTransactions, setIsLoadingTransactions] = useState(false);
   const [transactionError, setTransactionError] = useState<string | null>(null);
@@ -228,77 +248,90 @@ export function App() {
     setCurrentView('landing');
   };
 
-  // View Render Switch
-  if (currentView === 'landing') {
-    return (
-      <LandingPage
-        onGetStarted={() => setCurrentView('auth-register')}
-        onLogin={() => setCurrentView('auth-login')}
-      />
-    );
-  }
-
-  if (currentView === 'auth-login' || currentView === 'auth-register') {
-    return (
-      <AuthPage
-        initialMode={currentView === 'auth-login' ? 'login' : 'register'}
-        onSuccess={handleAuthSuccess}
-        onBackToLanding={() => setCurrentView('landing')}
-      />
-    );
-  }
-
+  // Unified Application Shell
   return (
-    <AppLayout
-      currentView={currentView}
-      onNavigate={handleNavigate}
-      user={user}
-      onLogout={handleLogout}
-    >
-      {currentView === 'dashboard' && (
-        <DashboardPage
-          transactions={transactions}
-          budgets={budgets}
-          summary={dashboardSummary}
-          isLoading={isLoadingDashboard}
-          onNavigate={handleNavigate}
-          onRefresh={loadDashboardSummary}
+    <div className="relative min-h-screen bg-[#070b14] text-slate-100 overflow-x-hidden selection:bg-cyan-500/30 selection:text-cyan-200">
+      {/* Global Animated Financial Data Intelligence Network */}
+      <GlobalNetworkBackground isIntroActive={isIntroActive} />
+
+      {/* Cinematic Logo Animation (executes once per browser session) */}
+      {isIntroActive && (
+        <FinShieldIntroReveal onComplete={handleIntroComplete} />
+      )}
+
+      {/* Active View Router */}
+      {currentView === 'landing' && (
+        <LandingPage
+          onGetStarted={() => setCurrentView('auth-register')}
+          onLogin={() => setCurrentView('auth-login')}
         />
       )}
-      {currentView === 'transactions' && (
-        <TransactionsPage
-          transactions={transactions}
-          isLoading={isLoadingTransactions}
-          error={transactionError}
-          onAddTransaction={handleAddTransaction}
-          onEditTransaction={handleEditTransaction}
-          onDeleteTransaction={handleDeleteTransaction}
-          onRefresh={loadTransactions}
+
+      {(currentView === 'auth-login' || currentView === 'auth-register') && (
+        <AuthPage
+          initialMode={currentView === 'auth-login' ? 'login' : 'register'}
+          onSuccess={handleAuthSuccess}
+          onBackToLanding={() => setCurrentView('landing')}
         />
       )}
-      {currentView === 'budgets' && (
-        <BudgetsPage
-          budgets={budgets}
-          isLoading={isLoadingBudgets}
-          error={budgetError}
-          onAddBudget={handleAddBudget}
-          onEditBudget={handleEditBudget}
-          onDeleteBudget={handleDeleteBudget}
-          onRefresh={loadBudgets}
-        />
-      )}
-      {currentView === 'scamshield' && <ScamShieldPage />}
-      {currentView === 'ai-assistant' && <AIAssistantPage />}
-      {currentView === 'security' && <SecurityPage />}
-      {currentView === 'reports' && <ReportsPage transactions={transactions} />}
-      {currentView === 'profile' && (
-        <ProfilePage
-          user={user}
-          onUpdateRole={handleUpdateRole}
-          onLogout={handleLogout}
-        />
-      )}
-    </AppLayout>
+
+      {currentView !== 'landing' &&
+        currentView !== 'auth-login' &&
+        currentView !== 'auth-register' && (
+          <AppLayout
+            currentView={currentView}
+            onNavigate={handleNavigate}
+            user={user}
+            onLogout={handleLogout}
+          >
+            {currentView === 'dashboard' && (
+              <DashboardPage
+                transactions={transactions}
+                budgets={budgets}
+                summary={dashboardSummary}
+                isLoading={isLoadingDashboard}
+                onNavigate={handleNavigate}
+                onRefresh={loadDashboardSummary}
+              />
+            )}
+            {currentView === 'transactions' && (
+              <TransactionsPage
+                transactions={transactions}
+                isLoading={isLoadingTransactions}
+                error={transactionError}
+                onAddTransaction={handleAddTransaction}
+                onEditTransaction={handleEditTransaction}
+                onDeleteTransaction={handleDeleteTransaction}
+                onRefresh={loadTransactions}
+              />
+            )}
+            {currentView === 'budgets' && (
+              <BudgetsPage
+                budgets={budgets}
+                isLoading={isLoadingBudgets}
+                error={budgetError}
+                onAddBudget={handleAddBudget}
+                onEditBudget={handleEditBudget}
+                onDeleteBudget={handleDeleteBudget}
+                onRefresh={loadBudgets}
+              />
+            )}
+            {currentView === 'scamshield' && <ScamShieldPage />}
+            {currentView === 'ai-assistant' && <AIAssistantPage />}
+            {currentView === 'security' && <SecurityPage />}
+            {currentView === 'reports' && (
+              <ReportsPage transactions={transactions} />
+            )}
+            {currentView === 'profile' && (
+              <ProfilePage
+                user={user}
+                onUpdateRole={handleUpdateRole}
+                onLogout={handleLogout}
+              />
+            )}
+          </AppLayout>
+        )}
+    </div>
   );
 }
 

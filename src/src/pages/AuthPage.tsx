@@ -14,6 +14,7 @@ import type { UserProfile } from '../types';
 import { authApi } from '../services/authApi';
 import { useI18n } from '../i18n';
 import { LanguageSelector } from '../components/LanguageSelector';
+import { FinShieldLogo } from '../components/FinShieldLogo';
 
 interface AuthPageProps {
   initialMode: 'login' | 'register';
@@ -109,7 +110,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col justify-center items-center px-4 py-12 relative selection:bg-cyan-500/30">
+    <div className="min-h-screen bg-transparent relative z-10 text-slate-100 flex flex-col justify-center items-center px-4 py-12 selection:bg-cyan-500/30">
       {/* Background ambient lighting */}
       <div className="absolute top-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -127,9 +128,12 @@ export const AuthPage: React.FC<AuthPageProps> = ({
       <div className="w-full max-w-md bg-[#0c1322] border border-slate-800 rounded-3xl p-8 shadow-2xl relative z-10 mt-8 sm:mt-0">
         {/* Header Logo */}
         <div className="flex flex-col items-center text-center mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-500 via-teal-400 to-cyan-300 flex items-center justify-center font-black text-slate-950 text-xl shadow-lg shadow-cyan-500/25 mb-3">
-            FS
-          </div>
+          <FinShieldLogo
+            size="lg"
+            showWordmark={false}
+            withGlow={true}
+            className="mb-3"
+          />
           <h2 className="text-2xl font-bold text-white tracking-tight">
             {mode === 'login' ? t('auth.welcomeBack') : t('auth.createAccount')}
           </h2>

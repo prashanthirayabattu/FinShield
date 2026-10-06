@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useI18n } from '../i18n';
 import { LanguageSelector } from '../components/LanguageSelector';
+import { FinShieldLogo } from '../components/FinShieldLogo';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -24,21 +25,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const { t } = useI18n();
 
   return (
-    <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200">
+    <div className="min-h-screen bg-transparent relative z-10 text-slate-100 flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200">
       {/* Top Navbar */}
       <header className="border-b border-slate-800/80 bg-[#090e1a]/80 backdrop-blur-md sticky top-0 z-50 px-6 lg:px-12 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 via-teal-400 to-cyan-300 flex items-center justify-center font-black text-slate-950 shadow-md shadow-cyan-500/20">
-            FS
-          </div>
-          <div>
-            <span className="font-extrabold text-xl tracking-tight text-white">
-              Fin<span className="text-cyan-400">Shield</span>
-            </span>
-            <span className="hidden sm:inline-block ml-2 text-xs font-mono text-slate-400 border border-slate-800 px-2 py-0.5 rounded-full">
-              PS-01 • {t('common.subtitle')}
-            </span>
-          </div>
+          <FinShieldLogo size="md" showWordmark={true} />
+          <span className="hidden sm:inline-block text-xs font-mono text-slate-400 border border-slate-800 px-2.5 py-1 rounded-full bg-slate-900/40">
+            PS-01 • {t('common.subtitle')}
+          </span>
         </div>
 
         <div className="flex items-center gap-3 sm:gap-4">
